@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+a<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -1247,7 +1247,13 @@ function upsert(t,rec){
     if(!EST.torre[filial]) EST.torre[filial]={disponivel:0,minimo:0,id:uid()};
     const est=EST.torre[filial];
     const qtd=Number(final.qtd)||0;
-    const _reservado=s=>s==='ativo'||s==='pendente'; // ambos consomem estoque
+
+    // Regras de estoque:
+    // ativo    → retira do estoque (saída)
+    // pendente → adiciona no estoque (entrada)
+    // inativo  → adiciona no estoque (entrada)
+    const _ehSaida =s=> s==='ativo';
+    const _ehEntrada=s=> s==='pendente'||s==='inativo';
 
     function _regHist(tipo,qtde,motivo){
       const h={id:uid(),filial,tipo,quantidade:qtde,motivo,cliente:final.cliente,created_at:new Date().toISOString()};
@@ -1255,41 +1261,60 @@ function upsert(t,rec){
     }
 
     if(!anterior){
-      // NOVO registro
-      if(_reservado(final.status)&&qtd>0){
-        est.disponivel=Math.max(0,est.disponivel-qtd);
-        const mot=final.status==='pendente'?'Torre reservada (pendente)':'Torre instalada';
-        _regHist('saida',qtd,mot);
-        showToast(`📡 ${qtd} torre(s) ${final.status==='pendente'?'reservada(s)':'instalada(s)'} — ${filial}`,'info');
+      // ── NOVO REGISTRO ──
+      if(qtd>0){
+        if(_ehSaida(final.status)){
+          est.disponivel=Math.max(0,est.disponivel-qtd);
+          _regHist('saida',qtd,'Torre instalada (ativo)');
+          showToast(`📡 ${qtd} torre(s) retirada(s) do estoque — ${filial}`,'info');
+        } else if(_ehEntrada(final.status)){
+          est.disponivel+=qtd;
+          const mot=final.status==='pendente'?'Torre pendente':'Torre inativa';
+          _regHist('entrada',qtd,mot);
+          showToast(`📦 ${qtd} torre(s) adicionada(s) ao estoque — ${filial}`,'ok');
+        }
       }
     } else {
-      // EDIÇÃO
+      // ── EDIÇÃO ──
       const de=anterior.status, para=final.status;
       const qtdAnt=Number(anterior.qtd)||0;
 
       if(de!==para){
-        // Mudança de status
-        if(!_reservado(de)&&_reservado(para)&&qtd>0){
-          // inativo → ativo/pendente: desconta
-          est.disponivel=Math.max(0,est.disponivel-qtd);
-          _regHist('saida',qtd,`Torre ${para}`);
-          showToast(`📡 ${qtd} torre(s) → ${para} em ${filial}`,'info');
-        } else if(_reservado(de)&&!_reservado(para)&&qtd>0){
-          // ativo/pendente → inativo: devolve
-          est.disponivel+=qtd;
-          _regHist('entrada',qtd,`Torre inativada`);
-          showToast(`↩ ${qtd} torre(s) devolvida(s) — ${filial}`,'ok');
+        // Status mudou: desfaz efeito anterior e aplica novo
+        if(qtd>0){
+          // Desfaz efeito do status anterior
+          if(_ehSaida(de)){
+            // era ativo (tinha retirado) → devolve
+            est.disponivel+=qtdAnt;
+            _regHist('entrada',qtdAnt,`Revertido: era ativo → agora ${para}`);
+          } else if(_ehEntrada(de)){
+            // era pendente/inativo (tinha adicionado) → retira de volta
+            est.disponivel=Math.max(0,est.disponivel-qtdAnt);
+            _regHist('saida',qtdAnt,`Revertido: era ${de} → agora ${para}`);
+          }
+          // Aplica efeito do novo status
+          if(_ehSaida(para)){
+            est.disponivel=Math.max(0,est.disponivel-qtd);
+            _regHist('saida',qtd,`Torre ativada — retirada do estoque`);
+            showToast(`📡 ${qtd} torre(s) retirada(s) — ${filial}`,'info');
+          } else if(_ehEntrada(para)){
+            est.disponivel+=qtd;
+            const mot=para==='pendente'?'Torre → pendente':'Torre → inativa';
+            _regHist('entrada',qtd,mot);
+            showToast(`📦 ${qtd} torre(s) devolvida(s) ao estoque — ${filial}`,'ok');
+          }
         }
-        // ativo↔pendente: já estava descontado, não mexe no estoque
-      } else if(_reservado(para)&&qtdAnt!==qtd){
-        // Mesmo status ativo/pendente, qtd mudou
+      } else if(qtdAnt!==qtd&&qtd>0){
+        // Mesmo status, qtd mudou
         const diff=qtd-qtdAnt;
-        if(diff>0){
-          est.disponivel=Math.max(0,est.disponivel-diff);
-          _regHist('saida',diff,'Qtd aumentada');
-        } else if(diff<0){
-          est.disponivel+=Math.abs(diff);
-          _regHist('entrada',Math.abs(diff),'Qtd reduzida');
+        if(_ehSaida(para)){
+          // ativo: aumento retira mais, redução devolve
+          if(diff>0){est.disponivel=Math.max(0,est.disponivel-diff);_regHist('saida',diff,'Qtd aumentada (ativo)');}
+          else{est.disponivel+=Math.abs(diff);_regHist('entrada',Math.abs(diff),'Qtd reduzida (ativo)');}
+        } else if(_ehEntrada(para)){
+          // pendente/inativo: aumento adiciona mais, redução retira
+          if(diff>0){est.disponivel+=diff;_regHist('entrada',diff,`Qtd aumentada (${para})`);}
+          else{est.disponivel=Math.max(0,est.disponivel-Math.abs(diff));_regHist('saida',Math.abs(diff),`Qtd reduzida (${para})`);}
         }
       }
     }
