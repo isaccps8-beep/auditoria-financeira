@@ -251,6 +251,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="spacer"></div>
   <div class="flex" style="gap:8px">
     <button class="hbtn" onclick="openImport()">↑ Importar</button>
+    <button class="hbtn" onclick="pushAllToSupabase()" title="Re-envia todos os dados locais ao Supabase">☁ Sincronizar</button>
     <div class="export-wrap">
       <button class="hbtn" onclick="toggleExportMenu()">↓ Exportar ▾</button>
       <div class="export-menu" id="export-menu">
@@ -789,20 +790,30 @@ function xhrRequest(method, url, data, callback){
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.setRequestHeader('apikey', SUPA_KEY);
   xhr.setRequestHeader('Authorization', 'Bearer ' + SUPA_KEY);
-  if(method === 'POST' || method === 'PATCH') xhr.setRequestHeader('Prefer', 'resolution=merge-duplicates,return=representation');
+  if(method === 'POST' || method === 'PATCH'){
+    xhr.setRequestHeader('Prefer', 'resolution=merge-duplicates,return=representation');
+  }
   if(method === 'DELETE') xhr.setRequestHeader('Prefer', 'return=minimal');
-  xhr.timeout = 15000;
+  xhr.timeout = 20000;
   xhr.onload = function(){
     if(xhr.status >= 200 && xhr.status < 300){
       try{ callback(null, JSON.parse(xhr.responseText || '[]')); }
       catch(e){ callback(null, []); }
     } else {
-      callback(new Error('HTTP ' + xhr.status), []);
+      const errMsg = 'HTTP ' + xhr.status + ' ' + xhr.statusText + ' | ' + xhr.responseText.slice(0,200);
+      console.error('[XHR '+method+']', url.split('/').pop(), errMsg);
+      callback(new Error(errMsg), []);
     }
   };
-  xhr.onerror = function(){ callback(new Error('network error'), []); };
-  xhr.ontimeout = function(){ callback(new Error('timeout'), []); };
-  // DELETE requests must not have a body
+  xhr.onerror = function(){
+    console.error('[XHR '+method+'] CORS/network error:', url.split('/').pop());
+    console.warn('Verifique: 1) Supabase CORS liberado para este domínio 2) Chave API válida');
+    callback(new Error('CORS/network error - verifique configurações do Supabase'), []);
+  };
+  xhr.ontimeout = function(){
+    console.error('[XHR '+method+'] timeout:', url.split('/').pop());
+    callback(new Error('timeout'), []);
+  };
   if(method === 'DELETE'){
     xhr.send(null);
   } else {
@@ -936,12 +947,24 @@ function hideSync(){const b=document.getElementById('sync-badge');if(b)b.classLi
 // PERSISTÊNCIA LOCAL
 // ══════════════════════════════════════════
 function save(){
-  try{localStorage.setItem(KEY,JSON.stringify({DB,EST,HIST}));}
-  catch(e){console.warn('localStorage cheio:',e);}
+  try{
+    localStorage.setItem(KEY,JSON.stringify({DB,EST,HIST}));
+  }catch(e){
+    // localStorage bloqueado (Edge tracking prevention) - tenta sessionStorage
+    try{
+      sessionStorage.setItem(KEY,JSON.stringify({DB,EST,HIST}));
+      console.warn('[save] localStorage bloqueado, usando sessionStorage');
+    }catch(e2){
+      console.warn('[save] Armazenamento local bloqueado pelo browser - dados apenas em memória');
+    }
+  }
 }
 function load(){
   try{
-    const r=localStorage.getItem(KEY);
+    // Tenta localStorage primeiro, depois sessionStorage
+    let r=null;
+    try{ r=localStorage.getItem(KEY); }catch(e){ console.warn('[load] localStorage bloqueado'); }
+    if(!r){ try{ r=sessionStorage.getItem(KEY); }catch(e){} }
     if(!r)return false;
     const d=JSON.parse(r);
     if(d.DB) Object.keys(DB).forEach(k=>{
@@ -1140,20 +1163,21 @@ async function saveToSupabase(t,r){
   try{
     const res=await sbPost(t,r);
     if(!res){
-      console.warn('saveToSupabase: sem resposta para',t);
+      console.warn('[Supabase] saveToSupabase: sem resposta para',t,'id=',r.id);
+      showToast('⚠ Supabase não respondeu ao salvar '+t,'error');
       return;
     }
     if(res.ok===false){
-      let msg='HTTP '+res.status;
-      try{const e=await res.json();msg=e.message||e.hint||msg;}catch{}
-      console.error('saveToSupabase erro:',t,msg);
-      showToast('⚠ Erro ao salvar em '+t+': '+msg,'error');
+      let msg='Erro desconhecido';
+      try{const e=JSON.parse(res);msg=e.message||e.hint||msg;}catch{}
+      console.error('[Supabase] ERRO ao salvar',t,':',msg,'| dados:',r);
+      showToast('❌ Supabase: '+msg,'error');
     } else {
-      console.info('saveToSupabase OK:',t,'id=',r.id);
+      console.info('[Supabase] ✓ Salvo:',t,'id=',r.id);
     }
   }catch(e){
-    console.error('saveToSupabase exception:',t,e.message);
-    showToast('Erro de rede ao salvar '+t,'error');
+    console.error('[Supabase] Exception ao salvar',t,':',e.message);
+    showToast('❌ Sem conexão com Supabase — dado salvo só localmente','error');
   }
 }
 
@@ -2916,6 +2940,19 @@ function buildRow(dest,mapped,headers){
 // ══════════════════════════════════════════
 // SINCRONIZAÇÃO MANUAL
 // ══════════════════════════════════════════
+async function pushAllToSupabase(){
+  // Re-envia TODOS os registros locais ao Supabase
+  showToast('Enviando dados ao Supabase…','info');
+  let count=0;
+  for(const t of TABLES){
+    for(const r of DB[t]){
+      await saveToSupabase(t,r);
+      count++;
+    }
+  }
+  showToast('✓ '+count+' registros enviados ao Supabase','ok');
+}
+
 async function forceSyncAndRender(){
   showToast('Sincronizando…','info');
   // Garante período
@@ -2955,8 +2992,16 @@ function renderAll(){
 //            2) busca Supabase → render final
 // ══════════════════════════════════════════
 async function init(){
-  // 1. Tema
-  const savedTheme=localStorage.getItem('theme')||'light';
+  // 1. Tema + verifica localStorage
+  let savedTheme='light';
+  try{
+    savedTheme=localStorage.getItem('theme')||'light';
+  }catch(e){
+    // localStorage bloqueado - mostra aviso
+    setTimeout(()=>{
+      showToast('⚠ Armazenamento local bloqueado pelo browser. Use Chrome ou libere cookies no Edge.','error');
+    }, 2000);
+  }
   document.documentElement.setAttribute('data-theme',savedTheme);
   document.getElementById('themeBtn').textContent=savedTheme==='dark'?'☀️':'🌙';
 
