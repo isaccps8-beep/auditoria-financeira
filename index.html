@@ -464,7 +464,7 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <!-- MONUV -->
 <div id="tab-monuv" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Monuv · Clientes</div></div><button class="btn btn-primary" onclick="openModal('monuv')">+ Novo Registro</button></div>
-  <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-monuv" placeholder="Fantasia…" oninput="renderMonuv()" style="min-width:160px"></div><div class="fg"><label>Status</label><select id="f-monuv-st" onchange="renderMonuv()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('monuv')">↓ Exportar ▾</button><div class="export-menu" id="em-monuv"><div class="export-item" onclick="exportTabCSV('monuv')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('monuv')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('monuv')">🗂 JSON</div></div></div></div>
+  <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-monuv" placeholder="Fantasia…" oninput="renderMonuv()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-monuv-per" onchange="renderMonuv()"></div><div class="fg"><label>Status</label><select id="f-monuv-st" onchange="renderMonuv()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('monuv')">↓ Exportar ▾</button><div class="export-menu" id="em-monuv"><div class="export-item" onclick="exportTabCSV('monuv')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('monuv')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('monuv')">🗂 JSON</div></div></div></div>
   <div class="bulk-bar" id="bulk-monuv">
     <span id="bulk-monuv-count">0 selecionados</span>
     <button class="btn btn-danger" onclick="bulkDelete('monuv')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
@@ -483,6 +483,7 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
       </div></div>
   <div class="filters">
     <div class="fg"><label>Pesquisar</label><input type="text" id="f-torre" placeholder="Cliente…" oninput="renderTorre()" style="min-width:140px"></div>
+    <div class="fg"><label>Período</label><input type="month" id="f-torre-per" onchange="renderTorre()"></div>
     <div class="fg"><label>Filial</label><select id="f-torre-fil" onchange="renderTorre()"><option value="">Todas</option></select></div>
     <div class="fg"><label>Status</label><select id="f-torre-st" onchange="renderTorre()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div>
     <div class="fg"><label>Tipo</label><select id="f-torre-tipo" onchange="renderTorre()"><option value="">Todos</option><option value="Portaria">Portaria</option><option value="Alarme">Alarme</option></select></div>
@@ -514,7 +515,7 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <!-- ARMÁRIOS -->
 <div id="tab-armario" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Armários · Locação</div></div><div class="flex" style="gap:8px"><button class="btn btn-estoque" onclick="openEstoqueArmario()">📦 Estoque de Armários</button><button class="btn btn-primary" onclick="openModal('armario')">+ Novo Registro</button></div></div>
-  <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-arm" placeholder="Condomínio…" oninput="renderArmario()" style="min-width:160px"></div><div class="fg"><label>Fornecedor</label><select id="f-arm-forn" onchange="renderArmario()"><option value="">Todos</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fg"><label>Status</label><select id="f-arm-st" onchange="renderArmario()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('armario')">↓ Exportar ▾</button><div class="export-menu" id="em-armario"><div class="export-item" onclick="exportTabCSV('armario')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('armario')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('armario')">🗂 JSON</div></div></div></div>
+  <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-arm" placeholder="Condomínio…" oninput="renderArmario()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-arm-per" onchange="renderArmario()"></div><div class="fg"><label>Fornecedor</label><select id="f-arm-forn" onchange="renderArmario()"><option value="">Todos</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fg"><label>Status</label><select id="f-arm-st" onchange="renderArmario()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('armario')">↓ Exportar ▾</button><div class="export-menu" id="em-armario"><div class="export-item" onclick="exportTabCSV('armario')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('armario')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('armario')">🗂 JSON</div></div></div></div>
   <div class="bulk-bar" id="bulk-armario">
     <span id="bulk-armario-count">0 selecionados</span>
     <button class="btn btn-danger" onclick="bulkDelete('armario')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
@@ -2422,10 +2423,11 @@ function renderHistorico(tipo){
 // RENDER TABLES
 // ══════════════════════════════════════════
 function renderMonuv(){
-  const fq=gi('f-monuv').toLowerCase(),fst=gi('f-monuv-st');
+  const fq=gi('f-monuv').toLowerCase(),fst=gi('f-monuv-st'),fper=gi('f-monuv-per');
   let rows=DB.monuv.filter(r=>
     (!fq||(r.fantasia||'').toLowerCase().includes(fq)||(r.filial||'').toLowerCase().includes(fq))&&
-    (!fst||r.status===fst)
+    (!fst||r.status===fst)&&
+    (!fper||(r.datacad||'').startsWith(fper.slice(0,7)))
   );
   rows=sortRows(rows,'monuv');
   const {slice,total,pages,page}=paginate(rows,'monuv');
@@ -2522,12 +2524,13 @@ function renderTorre(){
     const fs=[...new Set(DB.torre.map(r=>_normFilial(r.filial||'')).filter(Boolean))].sort();
     selFil.innerHTML='<option value="">Todas</option>'+fs.map(f=>`<option value="${f}"${f===a?' selected':''}>${f}</option>`).join('');
   }
-  const fq=gi('f-torre').toLowerCase(),fst=gi('f-torre-st'),ffil=gi('f-torre-fil'),ftipo=gi('f-torre-tipo');
+  const fq=gi('f-torre').toLowerCase(),fst=gi('f-torre-st'),ffil=gi('f-torre-fil'),ftipo=gi('f-torre-tipo'),fper=gi('f-torre-per');
   let rows=DB.torre.filter(r=>
     (!fq||(r.cliente||'').toLowerCase().includes(fq))&&
     (!fst||r.status===fst)&&
     (!ffil||_normFilial(r.filial||'')=== ffil)&&
-    (!ftipo||r.tipo===ftipo)
+    (!ftipo||r.tipo===ftipo)&&
+    (!fper||(r.data||'').startsWith(fper.slice(0,7)))
   );
   rows=sortRows(rows,'torre');
   const {slice,total,pages,page,s,e}=paginate(rows,'torre');
@@ -2630,11 +2633,12 @@ function renderTerc(){
 function renderTercPivot(){const periods=[...new Set(DB.terc.map(r=>r.period).filter(Boolean))].sort();const empresas=[...new Set(DB.terc.map(r=>r.empresa))];if(!periods.length){document.getElementById('pivot-hdr').innerHTML='';document.getElementById('pivot-body').innerHTML='';return;}const th=s=>`<th style="padding:8px 12px;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap">${s}</th>`;document.getElementById('pivot-hdr').innerHTML='<tr>'+th('Empresa')+periods.map(p=>th(fmtPeriod(p))).join('')+th('Total')+'</tr>';const td=(v,c='')=>`<td style="padding:8px 12px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;text-align:right;font-weight:${c?'800':'600'};${c?'color:'+c:''}">${v}</td>`;const td0=s=>`<td style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;font-weight:800">${s}</td>`;const rows=empresas.map(e=>{const cols=periods.map(p=>sum(DB.terc.filter(r=>r.empresa===e&&r.period===p),'total'));return '<tr>'+td0(e)+cols.map(c=>td(c>0?fmt(c):'—')).join('')+td(fmt(cols.reduce((a,b)=>a+b,0)),'var(--orange)')+'</tr>';});const tots=periods.map(p=>sum(DB.terc.filter(r=>r.period===p),'total'));rows.push(`<tr style="background:var(--surface3)"><td style="padding:8px 12px;font-size:12px;font-weight:800;color:var(--accent)">TOTAL</td>${tots.map(t=>td(fmt(t),'var(--accent)')).join('')}${td(fmt(tots.reduce((a,b)=>a+b,0)),'var(--accent)')}</tr>`);document.getElementById('pivot-body').innerHTML=rows.join('');}
 
 function renderArmario(){
-  const fq=gi('f-arm').toLowerCase(),ff=gi('f-arm-forn'),fst=gi('f-arm-st');
+  const fq=gi('f-arm').toLowerCase(),ff=gi('f-arm-forn'),fst=gi('f-arm-st'),fper=gi('f-arm-per');
   let rows=DB.armario.filter(r=>
     (!fq||(r.cond||'').toLowerCase().includes(fq)||(r.filial||'').toLowerCase().includes(fq))&&
     (!ff||r.fornecedor===ff)&&
-    (!fst||r.status===fst)
+    (!fst||r.status===fst)&&
+    (!fper||(r.inst||'').startsWith(fper.slice(0,7)))
   );
   rows=sortRows(rows,'armario');
   const {slice,total,pages,page}=paginate(rows,'armario');
