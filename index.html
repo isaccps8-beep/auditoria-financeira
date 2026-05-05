@@ -6,6 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234338ca'/><text y='.9em' font-size='60' x='50%' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>AF</text></svg>">
 <title>Auditoria v20260413_002701</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2421,7 +2422,7 @@ function renderMonuv(){
       <td style="color:var(--accent);font-weight:800;font-family:var(--mono);font-size:12px;cursor:pointer" onclick="verMonuv('${r.id}')">🔍 ${r.mid}</td>
       <td style="font-weight:800;cursor:pointer" onclick="verMonuv('${r.id}')">
         <div style="display:flex;align-items:center;gap:8px">
-          ${avatar(r.fantasia||'?')}
+          <span style="font-size:16px">📷</span>
           <span>${r.fantasia}</span>
         </div>
       </td>
@@ -2522,7 +2523,7 @@ function renderTorre(){
     <tr class="${r.status==='inativo'&&(r.vcliente||0)>0?'row-warn':''} row-${r.status||'ativo'}" data-id="${r.id}">
       <td>
         <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="verTorre('${r.id}')">
-          ${mkAv(r.cliente||'T',32)}
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--blue-l);border:1.5px solid color-mix(in srgb,var(--blue) 25%,transparent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${r.tipo==='Alarme'?'🚨':'📡'}</div>
           <div>
             <div style="font-weight:800;font-size:13px;color:var(--accent)">${r.cliente||'—'}</div>
             ${r.endereco?`<div style="font-size:10px;color:var(--text3);font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.endereco}</div>`:''}
@@ -2625,7 +2626,7 @@ function renderArmario(){
     <tr class="${(r.status==='inativo'||r.status==='pendente')&&r.total>0?'row-warn':''} row-${r.status||'ativo'}" data-id="${r.id}">
       <td class="sticky-col" style="cursor:pointer" onclick="verArmario('${r.id}')">
         <div style="display:flex;align-items:center;gap:8px">
-          ${mkAv(r.cond||'?',30)}
+          <div style="width:30px;height:30px;border-radius:8px;background:var(--purple-l);border:1.5px solid color-mix(in srgb,var(--purple) 25%,transparent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔒</div>
           <div style="font-weight:800;font-size:13px;color:var(--accent)">${r.cond||'—'}</div>
         </div>
       </td>
@@ -3658,8 +3659,14 @@ async function init(){
 
   if(hadLocal){
     setLoadingMsg('Renderizando…');
-    renderAll();
+    // Esconde loading imediatamente, renderiza em background
     hideLoading();
+    // Render rápido do dash primeiro, resto depois
+    setTimeout(()=>{
+      renderDash();
+      updateBadges();
+      setTimeout(()=>renderAll(), 100);
+    }, 50);
     setImmediate_polyfill(async()=>{
       await loadFromSupabase();
       renderAll();
