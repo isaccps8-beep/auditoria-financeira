@@ -242,9 +242,7 @@ tbody tr{animation:rowIn .18s ease both}
 [data-tip]:hover::after,[data-tip]:hover::before{opacity:1}
 
 /* ══ STATUS BADGES MELHORADOS ══ */
-.badge.bg-green::before{content:'✓ '}
-.badge.bg-red::before{content:'✕ '}
-.badge.bg-amber::before{content:'⏳ '}
+/* badge icons handled inline */
 
 /* ══ HOVER LINHA COM BORDA LATERAL ══ */
 tbody tr{border-left:3px solid transparent;transition:border-color .15s,background .1s}
@@ -254,13 +252,10 @@ tr.row-warn{border-left-color:var(--amber)!important}
 /* ══ AVATAR INICIAIS ══ */
 .av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;letter-spacing:-.5px}
 
-/* ══ SPARKLINE KPI ══ */
-.kpi-spark{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:6px}
-.kpi-spark-bar{width:4px;border-radius:2px;opacity:.7;transition:opacity .2s,height .4s}
-.kpi-spark-bar:hover{opacity:1}
+
 
 /* ══ SELECÃO MÚLTIPLA ══ */
-.row-check{width:16px;height:16px;cursor:pointer;accent-color:var(--accent)}
+.row-check{width:13px;height:13px;cursor:pointer;accent-color:var(--accent);margin:0}
 .bulk-bar{display:none;align-items:center;gap:10px;padding:8px 16px;background:var(--accent-l);border:2px solid var(--accent);border-radius:10px;margin-bottom:10px;font-size:13px;font-weight:700;color:var(--accent)}
 .bulk-bar.show{display:flex}
 
@@ -470,6 +465,11 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <div id="tab-monuv" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Monuv · Clientes</div></div><button class="btn btn-primary" onclick="openModal('monuv')">+ Novo Registro</button></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-monuv" placeholder="Fantasia…" oninput="renderMonuv()" style="min-width:160px"></div><div class="fg"><label>Status</label><select id="f-monuv-st" onchange="renderMonuv()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('monuv')">↓ Exportar ▾</button><div class="export-menu" id="em-monuv"><div class="export-item" onclick="exportTabCSV('monuv')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('monuv')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('monuv')">🗂 JSON</div></div></div></div>
+  <div class="bulk-bar" id="bulk-monuv">
+    <span id="bulk-monuv-count">0 selecionados</span>
+    <button class="btn btn-danger" onclick="bulkDelete('monuv')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
+    <button class="btn btn-ghost" onclick="clearBulk('monuv')" style="height:28px;padding:0 12px;font-size:12px">✕ Cancelar</button>
+  </div>
   <div id="alerts-monuv" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Fantasia</th><th>Filial</th><th>Câm.</th><th>Intel.</th><th>TL</th><th>Tot.Câm</th><th>Tot.Intel</th><th>Tot.TL</th><th>Total</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-monuv"></tbody></table><div class="tbl-foot" id="tf-monuv"></div></div>
 </div>
@@ -501,6 +501,11 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <div id="tab-terc" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Terceirizadas · Contratos</div></div><button class="btn btn-primary" onclick="openModal('terc')">+ Novo Registro</button></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-terc" placeholder="Empresa…" oninput="renderTerc()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-terc-per" onchange="renderTerc();renderTercPivot()"></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('terc')">↓ Exportar ▾</button><div class="export-menu" id="em-terc"><div class="export-item" onclick="exportTabCSV('terc')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('terc')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('terc')">🗂 JSON</div></div></div></div>
+  <div class="bulk-bar" id="bulk-terc">
+    <span id="bulk-terc-count">0 selecionados</span>
+    <button class="btn btn-danger" onclick="bulkDelete('terc')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
+    <button class="btn btn-ghost" onclick="clearBulk('terc')" style="height:28px;padding:0 12px;font-size:12px">✕ Cancelar</button>
+  </div>
   <div id="alerts-terc" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap" style="margin-bottom:16px"><table><thead><tr><th>Cód.</th><th>Empresa</th><th>Qtd.</th><th>Val.Unit.</th><th>Total</th><th>Período</th><th>Ações</th></tr></thead><tbody id="tb-terc"></tbody></table><div class="tbl-foot" id="tf-terc"></div></div>
   <div class="card"><div class="card-hdr"><div class="card-title">Resumo Mensal</div></div><div class="chart-body"><div class="pivot-wrap"><table id="tbl-pivot"><thead id="pivot-hdr"></thead><tbody id="pivot-body"></tbody></table></div></div></div>
@@ -510,6 +515,11 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <div id="tab-armario" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Armários · Locação</div></div><div class="flex" style="gap:8px"><button class="btn btn-estoque" onclick="openEstoqueArmario()">📦 Estoque de Armários</button><button class="btn btn-primary" onclick="openModal('armario')">+ Novo Registro</button></div></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-arm" placeholder="Condomínio…" oninput="renderArmario()" style="min-width:160px"></div><div class="fg"><label>Fornecedor</label><select id="f-arm-forn" onchange="renderArmario()"><option value="">Todos</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fg"><label>Status</label><select id="f-arm-st" onchange="renderArmario()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('armario')">↓ Exportar ▾</button><div class="export-menu" id="em-armario"><div class="export-item" onclick="exportTabCSV('armario')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('armario')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('armario')">🗂 JSON</div></div></div></div>
+  <div class="bulk-bar" id="bulk-armario">
+    <span id="bulk-armario-count">0 selecionados</span>
+    <button class="btn btn-danger" onclick="bulkDelete('armario')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
+    <button class="btn btn-ghost" onclick="clearBulk('armario')" style="height:28px;padding:0 12px;font-size:12px">✕ Cancelar</button>
+  </div>
   <div id="alerts-armario" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Condomínio</th><th>Filial</th><th>Fornecedor</th><th>Aquisição</th><th>Portas</th><th>Instalação</th><th>Entrada</th><th>Locação</th><th>Val.Cliente</th><th>Mensalidade</th><th>Val.Fornec.</th><th>Total</th><th>Endereço</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-armario"></tbody></table><div class="tbl-foot" id="tf-armario"></div></div>
 </div>
@@ -518,6 +528,11 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <div id="tab-segware" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Segware · Licenças</div></div><button class="btn btn-primary" onclick="openModal('segware')">+ Novo Registro</button></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-seg" placeholder="Produto…" oninput="renderSegware()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-seg-per" onchange="renderSegware()"></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('segware')">↓ Exportar ▾</button><div class="export-menu" id="em-segware"><div class="export-item" onclick="exportTabCSV('segware')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('segware')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('segware')">🗂 JSON</div></div></div></div>
+  <div class="bulk-bar" id="bulk-segware">
+    <span id="bulk-segware-count">0 selecionados</span>
+    <button class="btn btn-danger" onclick="bulkDelete('segware')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
+    <button class="btn btn-ghost" onclick="clearBulk('segware')" style="height:28px;padding:0 12px;font-size:12px">✕ Cancelar</button>
+  </div>
   <div id="alerts-segware" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Produto / Licença</th><th>Qtd.</th><th>Val.Unit.</th><th>Total</th><th>Período</th><th>Ações</th></tr></thead><tbody id="tb-segware"></tbody></table><div class="tbl-foot" id="tf-segware"></div></div>
 </div>
@@ -526,6 +541,11 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
 <div id="tab-selbit" class="tab">
   <div class="pg-hdr"><div><div class="pg-title">Selbetti · Impressão</div></div><button class="btn btn-primary" onclick="openModal('selbit')">+ Novo Registro</button></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-selbit" placeholder="ID ou descrição…" oninput="renderSelbit()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-selbit-per" onchange="renderSelbit()"></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('selbit')">↓ Exportar ▾</button><div class="export-menu" id="em-selbit"><div class="export-item" onclick="exportTabCSV('selbit')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('selbit')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('selbit')">🗂 JSON</div></div></div></div>
+  <div class="bulk-bar" id="bulk-selbit">
+    <span id="bulk-selbit-count">0 selecionados</span>
+    <button class="btn btn-danger" onclick="bulkDelete('selbit')" style="height:28px;padding:0 12px;font-size:12px">🗑 Excluir selecionados</button>
+    <button class="btn btn-ghost" onclick="clearBulk('selbit')" style="height:28px;padding:0 12px;font-size:12px">✕ Cancelar</button>
+  </div>
   <div id="alerts-selbit" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Descrição</th><th>Local</th><th>Valor</th><th>Imp.PB</th><th>Imp.Color</th><th>Vl.PB</th><th>Vl.Color</th><th>Tot.PB</th><th>Tot.Color</th><th>Total</th><th>Período</th><th>Ações</th></tr></thead><tbody id="tb-selbit"></tbody></table><div class="tbl-foot" id="tf-selbit"></div></div>
 </div>
@@ -1039,6 +1059,15 @@ function selAllTorre(cb){
   });
   updateBulkBar('torre');
 }
+function selAllTab(tab,cb){
+  document.querySelectorAll('.row-check[data-tab="'+tab+'"]').forEach(c=>{
+    c.checked=cb.checked;
+    if(cb.checked)_selected[tab].add(c.dataset.id);
+    else _selected[tab].delete(c.dataset.id);
+  });
+  updateBulkBar(tab);
+}
+function selAllTorre(cb){ selAllTab('torre',cb); }
 function _rerender(tab){({monuv:renderMonuv,torre:renderTorre,terc:()=>{renderTerc();renderTercPivot();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit})[tab]?.();}
 function paginate(rows,tab){
   const p=PAG[tab],total=rows.length,pages=Math.max(1,Math.ceil(total/p.size));
@@ -2403,6 +2432,7 @@ function renderMonuv(){
 
   const thead=document.querySelector('#tab-monuv thead tr');
   if(thead) thead.innerHTML=
+    '<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" onchange="selAllTab(\'monuv\',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
     thSort('monuv','mid','ID')+
     thSort('monuv','fantasia','Fantasia')+
     thSort('monuv','filial','Filial')+
@@ -2419,6 +2449,7 @@ function renderMonuv(){
 
   document.getElementById('tb-monuv').innerHTML=slice.length?slice.map(r=>`
     <tr class="${r.status==='inativo'&&r.total>0?'row-warn':''} row-${r.status||'ativo'}" data-id="${r.id}">
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="monuv" data-id="${r.id}" onchange="toggleSelect('monuv','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td style="color:var(--accent);font-weight:800;font-family:var(--mono);font-size:12px;cursor:pointer" onclick="verMonuv('${r.id}')">🔍 ${r.mid}</td>
       <td style="font-weight:800;cursor:pointer" onclick="verMonuv('${r.id}')">
         <div style="display:flex;align-items:center;gap:8px">
@@ -2504,7 +2535,7 @@ function renderTorre(){
   // Atualiza thead com colunas ordenáveis
   const thead=document.querySelector('#tab-torre thead tr');
   if(thead) thead.innerHTML=
-    '<th style="width:36px"><input type="checkbox" id="chk-all-torre" onchange="selAllTorre(this)"></th>'+
+    '<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" id="chk-all-torre" onchange="selAllTorre(this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
     thSort('torre','cliente','Cliente')+
     thSort('torre','filial','Filial')+
     thSort('torre','custo','Custo Torre')+
@@ -2520,7 +2551,8 @@ function renderTorre(){
     '<th>Ações</th>';
 
   document.getElementById('tb-torre').innerHTML=slice.length?slice.map(r=>`
-    <tr class="${r.status==='inativo'&&(r.vcliente||0)>0?'row-warn':''} row-${r.status||'ativo'}" data-id="${r.id}">
+    <tr class="${r.status==='inativo'&&(r.vcliente||0)>0?'row-warn':''}" data-id="${r.id}">
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="torre" data-id="${r.id}" onchange="toggleSelect('torre','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="verTorre('${r.id}')">
           <div style="width:32px;height:32px;border-radius:8px;background:var(--blue-l);border:1.5px solid color-mix(in srgb,var(--blue) 25%,transparent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${r.tipo==='Alarme'?'🚨':'📡'}</div>
@@ -2572,9 +2604,11 @@ function renderTerc(){
   rows=sortRows(rows,'terc');
   const {slice,total,pages,page}=paginate(rows,'terc');
   const thead=document.querySelector('#tab-terc thead tr');
-  if(thead) thead.innerHTML=thSort('terc','cod','Cód.')+thSort('terc','empresa','Empresa')+thSort('terc','qtd','Qtd.')+thSort('terc','unit','Val.Unit.')+thSort('terc','total','Total')+thSort('terc','period','Período')+'<th>Ações</th>';
+  if(thead) thead.innerHTML='<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" onchange="selAllTab(\'terc\',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
+    thSort('terc','cod','Cód.')+thSort('terc','empresa','Empresa')+thSort('terc','qtd','Qtd.')+thSort('terc','unit','Val.Unit.')+thSort('terc','total','Total')+thSort('terc','period','Período')+'<th>Ações</th>';
   document.getElementById('tb-terc').innerHTML=slice.length?slice.map(r=>`
     <tr class="${r.warn?'row-warn':''}">
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="terc" data-id="${r.id}" onchange="toggleSelect('terc','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td style="color:var(--accent);font-weight:800;font-family:var(--mono);font-size:12px">${r.cod||'—'}</td>
       <td style="font-weight:800;cursor:pointer" onclick="verTerc('${r.id}')">${r.empresa}${r.warn?' <span class="badge bg-amber">Atípico</span>':''}</td>
       <td style="font-family:var(--mono)">${r.qtd}</td>
@@ -2607,6 +2641,7 @@ function renderArmario(){
 
   const thead=document.querySelector('#tab-armario thead tr');
   if(thead) thead.innerHTML=
+    '<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" onchange="selAllTab(\'armario\',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
     thSort('armario','cond','Condomínio')+
     thSort('armario','filial','Filial')+
     thSort('armario','fornecedor','Fornecedor')+
@@ -2624,6 +2659,7 @@ function renderArmario(){
 
   document.getElementById('tb-armario').innerHTML=slice.length?slice.map(r=>`
     <tr class="${(r.status==='inativo'||r.status==='pendente')&&r.total>0?'row-warn':''} row-${r.status||'ativo'}" data-id="${r.id}">
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="armario" data-id="${r.id}" onchange="toggleSelect('armario','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td class="sticky-col" style="cursor:pointer" onclick="verArmario('${r.id}')">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="width:30px;height:30px;border-radius:8px;background:var(--purple-l);border:1.5px solid color-mix(in srgb,var(--purple) 25%,transparent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔒</div>
@@ -2668,9 +2704,11 @@ function renderSegware(){
   rows=sortRows(rows,'segware');
   const {slice,total,pages,page}=paginate(rows,'segware');
   const thead=document.querySelector('#tab-segware thead tr');
-  if(thead) thead.innerHTML=thSort('segware','produto','Produto / Licença')+thSort('segware','qtd','Qtd.')+thSort('segware','unit','Val.Unit.')+thSort('segware','total','Total')+thSort('segware','period','Período')+'<th>Ações</th>';
+  if(thead) thead.innerHTML='<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" onchange="selAllTab(\'segware\',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
+    thSort('segware','produto','Produto / Licença')+thSort('segware','qtd','Qtd.')+thSort('segware','unit','Val.Unit.')+thSort('segware','total','Total')+thSort('segware','period','Período')+'<th>Ações</th>';
   document.getElementById('tb-segware').innerHTML=slice.length?slice.map(r=>`
     <tr>
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="segware" data-id="${r.id}" onchange="toggleSelect('segware','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSegware('${r.id}')">🔍 ${r.produto}</td>
       <td style="font-family:var(--mono)">${r.qtd}</td>
       <td style="font-family:var(--mono)">${fmt(r.unit)}</td>
@@ -2693,9 +2731,11 @@ function renderSelbit(){
   rows=sortRows(rows,'selbit');
   const {slice,total,pages,page}=paginate(rows,'selbit');
   const thead=document.querySelector('#tab-selbit thead tr');
-  if(thead) thead.innerHTML=thSort('selbit','sid','ID')+thSort('selbit','desc','Descrição')+'<th>Local</th>'+thSort('selbit','valor','Valor')+thSort('selbit','impPB','Imp.PB')+thSort('selbit','impColor','Imp.Color')+'<th>Vl.PB</th><th>Vl.Color</th>'+thSort('selbit','totPB','Tot.PB')+thSort('selbit','totColor','Tot.Color')+thSort('selbit','total','Total')+thSort('selbit','period','Período')+'<th>Ações</th>';
+  if(thead) thead.innerHTML='<th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" onchange="selAllTab(\'selbit\',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>'+
+    thSort('selbit','sid','ID')+thSort('selbit','desc','Descrição')+'<th>Local</th>'+thSort('selbit','valor','Valor')+thSort('selbit','impPB','Imp.PB')+thSort('selbit','impColor','Imp.Color')+'<th>Vl.PB</th><th>Vl.Color</th>'+thSort('selbit','totPB','Tot.PB')+thSort('selbit','totColor','Tot.Color')+thSort('selbit','total','Total')+thSort('selbit','period','Período')+'<th>Ações</th>';
   document.getElementById('tb-selbit').innerHTML=slice.length?slice.map(r=>`
     <tr>
+      <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="selbit" data-id="${r.id}" onchange="toggleSelect('selbit','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
       <td style="color:var(--accent);font-weight:800;font-family:var(--mono);font-size:12px">${r.sid||'—'}</td>
       <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSelbit('${r.id}')">🔍 ${r.desc||'—'}</td>
       <td style="color:var(--text3)">${r.local||'—'}</td>
@@ -2966,35 +3006,16 @@ function _renderDashNow(){
     {l:'Selbit',v:vsl,p:pvsl,c:'c6',i:'💻',svc:'selbit',tip:'Impressões do período selecionado'}
   ];
 
-  // Mini sparkline 6 meses
-  const {pr:_sp}=mRange(period,6);
-  const _spVals={
-    all:_sp.map(p=>totMonuv()+totTorre()+totTerc(p)+totArmario()+totSegware(p)+totSelbit(p)),
-    monuv:_sp.map(()=>totMonuv()), torre:_sp.map(()=>totTorre()),
-    terc:_sp.map(p=>totTerc(p)),   armario:_sp.map(()=>totArmario()),
-    segware:_sp.map(p=>totSegware(p)), selbit:_sp.map(p=>totSelbit(p))
-  };
-  const _sparkCols={c0:'var(--accent)',c1:'var(--green)',c2:'var(--blue)',c3:'var(--orange)',c4:'var(--purple)',c5:'var(--cyan)',c6:'var(--teal)'};
-  function _mkSpark(vals,col){
-    const mx=Math.max(...vals,1);
-    return '<div class="kpi-spark">'+vals.map(v=>{
-      const h=Math.max(3,Math.round(v/mx*22));
-      return `<div class="kpi-spark-bar" style="height:${h}px;background:${col}"></div>`;
-    }).join('')+'</div>';
-  }
-
   document.getElementById('kpi-grid').innerHTML=_kpiDefs.map((k,idx)=>{
     const d=k.p!==null&&k.p!==undefined?pct(k.v,k.p):null;
     const dH=d===null?'':`<span class="delta ${d>0?'up':d<0?'dn':'eq'}">${d>0?'↑':d<0?'↓':'→'} ${Math.abs(d).toFixed(1)}%</span>`;
     const pH=cP?`<span class="kpi-cmp">vs ${fmtPeriod(cP)}</span>`:'';
     const isActive=_kpiSvc===k.svc;
-    const spark=_mkSpark(_spVals[k.svc]||[],_sparkCols[k.c]);
     return `<div class="kpi ${k.c}${isActive?' active':''}" data-svc="${k.svc}" onclick="kpiClick('${k.svc}',this)" data-tip="${k.tip}">
       <div class="kpi-ico">${k.i}</div>
       <div class="kpi-lbl">${k.l}</div>
       <div class="kpi-val">${fmt(k.v)}</div>
       <div class="kpi-meta">${dH}${pH}</div>
-      ${spark}
     </div>`;
   }).join('');
   buildLine(period,svc);
