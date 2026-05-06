@@ -707,13 +707,12 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
     <div class="fgroup"><label>Data Instalação</label><input type="date" id="t-data"></div>
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--blue)">Quantidades</div><div class="fg-grid">
-    <div class="fgroup"><label>Qtd. Torres</label><input type="number" id="t-qtd" min="0" placeholder="0"></div>
+    <div class="fgroup"><label>Qtd. Torres</label><input type="number" id="t-qtd" min="0" placeholder="0" oninput="calcT()"></div>
+  <div class="fgroup"><label style="color:var(--amber)">⭐ Torres Gratificadas</label><input type="number" id="t-gratificadas" min="0" value="0" placeholder="0" oninput="calcT()" style="border-color:var(--amber);border-width:2px"></div>
+  <div class="fgroup" style="grid-column:1/-1"><small id="t-cobradas-info" style="color:var(--amber);font-weight:700;font-size:12px"></small></div>
     <div class="fgroup"><label>Qtd. Câmeras</label><input type="number" id="t-cameras" min="0" placeholder="0"></div>
     <div class="fgroup"><label>Qtd. Inteligências</label><input type="number" id="t-intels" min="0" placeholder="0"></div>
-    <div class="fgroup"><label>Tipo de Inteligência</label><select id="t-tipo-intel"><option value="">— Selecione —</option><option value="Monuv">Monuv</option><option value="Octos">Octos</option><option value="SegwareAI">SegwareAI</option></select></div><div class="fgroup" style="display:flex;align-items:center;gap:10px;padding-top:6px">
-  <input type="checkbox" id="t-gratificado" style="width:16px;height:16px;cursor:pointer;accent-color:var(--amber)">
-  <label for="t-gratificado" style="cursor:pointer;color:var(--amber);font-weight:800;margin:0">⭐ Serviço Gratificado</label>
-</div>
+    <div class="fgroup"><label>Tipo de Inteligência</label><select id="t-tipo-intel"><option value="">— Selecione —</option><option value="Monuv">Monuv</option><option value="Octos">Octos</option><option value="SegwareAI">SegwareAI</option></select></div>
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid">
     <div class="fgroup"><label>Custo da Torre (R$) *</label><input type="number" id="t-custo" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
@@ -1495,7 +1494,7 @@ function closeModal(type){const el=document.getElementById('modal-'+type);if(el)
 
 const FIELDS={
   monuv:[['m-id','mid'],['m-fantasia','fantasia'],['m-filial','filial'],['m-datacad','datacad'],['m-status','status'],['m-qcam','qCam'],['m-qintel','qIntel'],['m-qtl','qTL'],['m-vcam','vCam'],['m-vintel','vIntel'],['m-vtl','vTL']],
-  torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-gratificado','gratificado','bool'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
+  torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-gratificadas','gratificadas'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
   terc:[['e-cod','cod'],['e-emp','empresa'],['e-qtd','qtd'],['e-unit','unit'],['e-per','period']],
   armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-prevpag','prevpag'],['a-entrada','entrada'],['a-frete','frete'],['a-gestao','gestao'],['a-locacao','locacao'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
   segware:[['sg-produto','produto'],['sg-qtd','qtd'],['sg-unit','unit'],['sg-per','period']],
@@ -1543,7 +1542,13 @@ function updateStatusColor(id){
 const gi=id=>{const el=document.getElementById(id);return el?el.value.trim():''};
 const gn=id=>Number(gi(id))||0;
 function calcM(){const tc=gn('m-qcam')*gn('m-vcam'),ti=gn('m-qintel')*gn('m-vintel'),tt=gn('m-qtl')*gn('m-vtl');document.getElementById('m-tcam').value=fmt(tc);document.getElementById('m-tintel').value=fmt(ti);document.getElementById('m-ttl').value=fmt(tt);document.getElementById('m-total').value=fmt(tc+ti+tt);}
-function calcT(){document.getElementById('t-total').value=fmt(gn('t-vcliente'));}
+function calcT(){
+  const qtd=gn('t-qtd'), grat=gn('t-gratificadas');
+  const cobradas=Math.max(0,qtd-grat);
+  const el=document.getElementById('t-cobradas-info');
+  if(el) el.textContent=grat>0?`Torres cobradas: ${cobradas} de ${qtd} (${grat} gratificada${grat>1?'s':''})` :'';
+  document.getElementById('t-total').value=fmt(gn('t-vcliente'));
+}
 function calcE(){document.getElementById('e-total').value=fmt(gn('e-qtd')*gn('e-unit'));}
 function calcA(){document.getElementById('a-total').value=fmt(gn('a-vcliente'));}
 function calcSG(){document.getElementById('sg-total').value=fmt(gn('sg-qtd')*gn('sg-unit'));}
@@ -1554,7 +1559,7 @@ function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn
 // ══════════════════════════════════════════
 function saveRecord(type){
   if(type==='monuv'){const mid=gi('m-id'),fantasia=gi('m-fantasia'),datacad=gi('m-datacad');if(!mid||!fantasia||!datacad)return alert('Preencha ID, Fantasia e Data.');if(!_ed.monuv&&DB.monuv.find(r=>r.mid===mid))return alert('ID já existe.');const qCam=gn('m-qcam'),qIntel=gn('m-qintel'),qTL=gn('m-qtl'),vCam=gn('m-vcam'),vIntel=gn('m-vintel'),vTL=gn('m-vtl'),totCam=qCam*vCam,totIntel=qIntel*vIntel,totTL=qTL*vTL;upsert('monuv',{mid,fantasia,filial:gi('m-filial'),datacad,status:gi('m-status'),qCam,qIntel,qTL,vCam,vIntel,vTL,totCam,totIntel,totTL,total:totCam+totIntel+totTL});closeModal('monuv');renderMonuv();updateBadges();const _dm2=document.getElementById('dash-month');if(!_dm2.value)_dm2.value=nowM();renderDash();}
-  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificado=document.getElementById('t-gratificado')?.checked||false;upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificado});closeModal('torre');
+  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
     renderTorre();
     updateBadges();
     const _dm = document.getElementById('dash-month');
@@ -1822,8 +1827,17 @@ function verTorre(id){
     <div class="ver-grid" style="grid-template-columns:1fr 1fr 1fr;padding-bottom:20px">
       <div class="ver-stat">
         <div class="ver-stat-num" style="color:var(--blue)">${r.qtd||0}</div>
-        <div class="ver-stat-lbl">Torres</div>
+        <div class="ver-stat-lbl">Torres Total</div>
       </div>
+      ${(r.gratificadas>0)?`
+      <div class="ver-stat">
+        <div class="ver-stat-num" style="color:var(--amber)">${r.gratificadas}</div>
+        <div class="ver-stat-lbl">⭐ Gratificadas</div>
+      </div>
+      <div class="ver-stat">
+        <div class="ver-stat-num" style="color:var(--green)">${Math.max(0,(r.qtd||0)-(r.gratificadas||0))}</div>
+        <div class="ver-stat-lbl">Cobradas</div>
+      </div>`:''}
       <div class="ver-stat">
         <div class="ver-stat-num" style="color:var(--cyan)">${r.cameras||0}</div>
         <div class="ver-stat-lbl">Câmeras</div>
@@ -2576,7 +2590,16 @@ function renderTorre(){
       </td>
       <td><span class="badge bg-blue">${_normFilial(r.filial)||'—'}</span></td>
       <td style="font-family:var(--mono);color:var(--orange);font-weight:700">${fmt(r.custo||0)}</td>
-      <td style="text-align:center"><span class="badge bg-blue" style="min-width:28px;justify-content:center">${r.qtd||0}</span></td>
+      <td style="text-align:center;white-space:nowrap">
+        ${(r.gratificadas>0)
+          ? `<span title="${r.qtd||0} torres · ${r.gratificadas} gratificada(s) · ${Math.max(0,(r.qtd||0)-(r.gratificadas||0))} cobrada(s)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--blue-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help">
+              <span style="color:var(--blue)">${r.qtd||0}</span>
+              <span style="color:var(--text3);font-size:10px">/</span>
+              <span style="color:var(--amber)">⭐${r.gratificadas}</span>
+            </span>`
+          : `<span class="badge bg-blue" style="min-width:28px;justify-content:center">${r.qtd||0}</span>`
+        }
+      </td>
       <td style="text-align:center;font-family:var(--mono);color:var(--text2)">${r.cameras||'—'}</td>
       <td style="text-align:center;font-family:var(--mono);color:var(--text2)">${r.intels||'—'}</td>
       <td>${intelBadge(r.tipoIntel)}</td>
@@ -2586,7 +2609,7 @@ function renderTorre(){
       <td style="color:var(--text3);font-size:12px;white-space:nowrap">${fmtDate(r.data)}</td>
       <td>
         <span class="badge ${statusBadge(r.status)}">${r.status}</span>
-        ${r.gratificado?'<span class="badge bg-amber" style="margin-left:4px">⭐ Grat.</span>':''}
+
       </td>
       <td>
         <div style="display:flex;gap:4px">
