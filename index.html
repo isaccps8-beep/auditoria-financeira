@@ -710,7 +710,10 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
     <div class="fgroup"><label>Qtd. Torres</label><input type="number" id="t-qtd" min="0" placeholder="0"></div>
     <div class="fgroup"><label>Qtd. Câmeras</label><input type="number" id="t-cameras" min="0" placeholder="0"></div>
     <div class="fgroup"><label>Qtd. Inteligências</label><input type="number" id="t-intels" min="0" placeholder="0"></div>
-    <div class="fgroup"><label>Tipo de Inteligência</label><select id="t-tipo-intel"><option value="">— Selecione —</option><option value="Monuv">Monuv</option><option value="Octos">Octos</option><option value="SegwareAI">SegwareAI</option></select></div>
+    <div class="fgroup"><label>Tipo de Inteligência</label><select id="t-tipo-intel"><option value="">— Selecione —</option><option value="Monuv">Monuv</option><option value="Octos">Octos</option><option value="SegwareAI">SegwareAI</option></select></div><div class="fgroup" style="display:flex;align-items:center;gap:10px;padding-top:6px">
+  <input type="checkbox" id="t-gratificado" style="width:16px;height:16px;cursor:pointer;accent-color:var(--amber)">
+  <label for="t-gratificado" style="cursor:pointer;color:var(--amber);font-weight:800;margin:0">⭐ Serviço Gratificado</label>
+</div>
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid">
     <div class="fgroup"><label>Custo da Torre (R$) *</label><input type="number" id="t-custo" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
@@ -1492,7 +1495,7 @@ function closeModal(type){const el=document.getElementById('modal-'+type);if(el)
 
 const FIELDS={
   monuv:[['m-id','mid'],['m-fantasia','fantasia'],['m-filial','filial'],['m-datacad','datacad'],['m-status','status'],['m-qcam','qCam'],['m-qintel','qIntel'],['m-qtl','qTL'],['m-vcam','vCam'],['m-vintel','vIntel'],['m-vtl','vTL']],
-  torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
+  torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-gratificado','gratificado','bool'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
   terc:[['e-cod','cod'],['e-emp','empresa'],['e-qtd','qtd'],['e-unit','unit'],['e-per','period']],
   armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-prevpag','prevpag'],['a-entrada','entrada'],['a-frete','frete'],['a-gestao','gestao'],['a-locacao','locacao'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
   segware:[['sg-produto','produto'],['sg-qtd','qtd'],['sg-unit','unit'],['sg-per','period']],
@@ -1551,7 +1554,7 @@ function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn
 // ══════════════════════════════════════════
 function saveRecord(type){
   if(type==='monuv'){const mid=gi('m-id'),fantasia=gi('m-fantasia'),datacad=gi('m-datacad');if(!mid||!fantasia||!datacad)return alert('Preencha ID, Fantasia e Data.');if(!_ed.monuv&&DB.monuv.find(r=>r.mid===mid))return alert('ID já existe.');const qCam=gn('m-qcam'),qIntel=gn('m-qintel'),qTL=gn('m-qtl'),vCam=gn('m-vcam'),vIntel=gn('m-vintel'),vTL=gn('m-vtl'),totCam=qCam*vCam,totIntel=qIntel*vIntel,totTL=qTL*vTL;upsert('monuv',{mid,fantasia,filial:gi('m-filial'),datacad,status:gi('m-status'),qCam,qIntel,qTL,vCam,vIntel,vTL,totCam,totIntel,totTL,total:totCam+totIntel+totTL});closeModal('monuv');renderMonuv();updateBadges();const _dm2=document.getElementById('dash-month');if(!_dm2.value)_dm2.value=nowM();renderDash();}
-  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs')});closeModal('torre');
+  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificado=document.getElementById('t-gratificado')?.checked||false;upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificado});closeModal('torre');
     renderTorre();
     updateBadges();
     const _dm = document.getElementById('dash-month');
@@ -1745,6 +1748,12 @@ function mkAv(name,size){
   return `<div class="av" style="width:${size}px;height:${size}px;background:${cols[ci]};font-size:${Math.round(size*.35)}px">${init}</div>`;
 }
 
+// Badge colorido por tipo de inteligência
+function intelBadge(tipo){
+  const map={'Monuv':'bg-green','Octos':'bg-purple','SegwareAI':'bg-cyan','Gratificação':'bg-amber'};
+  return tipo?`<span class="badge ${map[tipo]||'bg-blue'}">${tipo}</span>`:'<span style="color:var(--text3)">—</span>';
+}
+
 function updateBadges(){Object.keys(DB).forEach(k=>{const el=document.getElementById('nb-'+k);if(el)el.textContent=DB[k].length;});}
 function abtn(t,id,lbl){const l=(lbl||'').replace(/'/g,"\\'");return `<div style="display:flex;gap:4px"><button class="btn btn-ghost" style="padding:3px 10px;font-size:12px;height:30px" onclick="openModal('${t}','${id}')">✏️</button><button class="btn btn-danger" style="padding:3px 10px;font-size:12px;height:30px" onclick="askDelete('${t}','${id}','${l}')">✕</button></div>`;}
 function emptyR(c,label){
@@ -1802,7 +1811,7 @@ function verTorre(id){
       </div>
       <div class="ver-card ver-grid-full" style="grid-column:2/-1">
         <div class="ver-card-lbl">Inteligência</div>
-        <div class="ver-card-val">${r.tipoIntel?`<span class="badge bg-purple">${r.tipoIntel}</span>`:'—'}</div>
+        <div class="ver-card-val">${intelBadge(r.tipoIntel)}</div>
       </div>
     </div>
 
@@ -2570,12 +2579,15 @@ function renderTorre(){
       <td style="text-align:center"><span class="badge bg-blue" style="min-width:28px;justify-content:center">${r.qtd||0}</span></td>
       <td style="text-align:center;font-family:var(--mono);color:var(--text2)">${r.cameras||'—'}</td>
       <td style="text-align:center;font-family:var(--mono);color:var(--text2)">${r.intels||'—'}</td>
-      <td>${r.tipoIntel?`<span class="badge bg-purple">${r.tipoIntel}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
+      <td>${intelBadge(r.tipoIntel)}</td>
       <td style="text-align:center">${r.contrato==='Sim'?'<span class="badge bg-green">✓ Sim</span>':'<span class="badge bg-red">Não</span>'}</td>
       <td style="font-family:var(--mono);color:var(--green);font-weight:800">${fmt(r.vcliente||0)}</td>
       <td>${r.tipo?`<span class="badge bg-cyan">${r.tipo}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
       <td style="color:var(--text3);font-size:12px;white-space:nowrap">${fmtDate(r.data)}</td>
-      <td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td>
+      <td>
+        <span class="badge ${statusBadge(r.status)}">${r.status}</span>
+        ${r.gratificado?'<span class="badge bg-amber" style="margin-left:4px">⭐ Grat.</span>':''}
+      </td>
       <td>
         <div style="display:flex;gap:4px">
           <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verTorre('${r.id}')">👁</button>
