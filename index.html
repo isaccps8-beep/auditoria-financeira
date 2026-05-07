@@ -716,6 +716,7 @@ th.sort-desc::after{content:'↓';opacity:1;color:var(--accent)}
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid">
     <div class="fgroup"><label>Custo da Torre (R$) *</label><input type="number" id="t-custo" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
+  <div class="fgroup"><label style="color:var(--orange)">Custo Total Empresa</label><input id="t-custo-total" readonly style="color:var(--orange);font-weight:800;background:var(--surface2)" placeholder="Calculado auto."></div>
     <div class="fgroup"><label>Val. Cobrado Cliente (R$)</label><input type="number" id="t-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
     <div class="fgroup"><label>Val. Cobrado Cliente</label><input id="t-total" readonly style="color:var(--green);font-weight:800"></div>
   </div></div>
@@ -1248,6 +1249,7 @@ function normalizeRecord(table, row){
     // Mapeia todos os campos conhecidos
     r.vcliente  = Number(r.vcliente  || r.val_cliente || r.valor_cliente || r.valcliente || r.v_cliente || 0);
     r.custo     = Number(r.custo     || r.custo_torre  || r.custoTorre   || 0);
+    r.custoTotal= Number(r.custoTotal || r.custo_total  || 0) || (r.qtd||0)*(r.custo||0);
     r.qtd       = Number(r.qtd       || r.qtd_torres   || r.qtdTorres    || 0);
     r.cameras   = Number(r.cameras   || r.qtd_cameras  || r.qtdCameras   || 0);
     r.intels    = Number(r.intels    || r.qtd_intels   || r.qtdIntels    || 0);
@@ -1543,10 +1545,17 @@ const gi=id=>{const el=document.getElementById(id);return el?el.value.trim():''}
 const gn=id=>Number(gi(id))||0;
 function calcM(){const tc=gn('m-qcam')*gn('m-vcam'),ti=gn('m-qintel')*gn('m-vintel'),tt=gn('m-qtl')*gn('m-vtl');document.getElementById('m-tcam').value=fmt(tc);document.getElementById('m-tintel').value=fmt(ti);document.getElementById('m-ttl').value=fmt(tt);document.getElementById('m-total').value=fmt(tc+ti+tt);}
 function calcT(){
-  const qtd=gn('t-qtd'), grat=gn('t-gratificadas');
+  const qtd=gn('t-qtd'), grat=gn('t-gratificadas'), custoUnit=gn('t-custo');
   const cobradas=Math.max(0,qtd-grat);
+  const custoTotal=qtd*custoUnit; // custo real da empresa (todas as torres, incl. gratificadas)
   const el=document.getElementById('t-cobradas-info');
-  if(el) el.textContent=grat>0?`Torres cobradas: ${cobradas} de ${qtd} (${grat} gratificada${grat>1?'s':''})` :'';
+  if(el) el.innerHTML=grat>0
+    ?`<span style="color:var(--amber)">⭐ ${grat} gratificada${grat>1?'s':''} · Torres cobradas ao cliente: ${cobradas}</span>`
+    +'<span style="color:var(--orange);margin-left:10px">Custo total empresa: '+fmt(custoTotal)+'</span>'
+    :'<span style="color:var(--orange)">Custo total empresa: '+fmt(custoTotal)+'</span>';
+  // Salva custo total no campo (todas as torres × custo unitário)
+  const ctEl=document.getElementById('t-custo-total');
+  if(ctEl) ctEl.value=fmt(custoTotal);
   document.getElementById('t-total').value=fmt(gn('t-vcliente'));
 }
 function calcE(){document.getElementById('e-total').value=fmt(gn('e-qtd')*gn('e-unit'));}
@@ -1559,7 +1568,8 @@ function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn
 // ══════════════════════════════════════════
 function saveRecord(type){
   if(type==='monuv'){const mid=gi('m-id'),fantasia=gi('m-fantasia'),datacad=gi('m-datacad');if(!mid||!fantasia||!datacad)return alert('Preencha ID, Fantasia e Data.');if(!_ed.monuv&&DB.monuv.find(r=>r.mid===mid))return alert('ID já existe.');const qCam=gn('m-qcam'),qIntel=gn('m-qintel'),qTL=gn('m-qtl'),vCam=gn('m-vcam'),vIntel=gn('m-vintel'),vTL=gn('m-vtl'),totCam=qCam*vCam,totIntel=qIntel*vIntel,totTL=qTL*vTL;upsert('monuv',{mid,fantasia,filial:gi('m-filial'),datacad,status:gi('m-status'),qCam,qIntel,qTL,vCam,vIntel,vTL,totCam,totIntel,totTL,total:totCam+totIntel+totTL});closeModal('monuv');renderMonuv();updateBadges();const _dm2=document.getElementById('dash-month');if(!_dm2.value)_dm2.value=nowM();renderDash();}
-  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
+  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');
+    const custoTotal=gn('t-qtd')*custo; // custo real: todas as torres × unitárioupsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas,custoTotal});closeModal('torre');
     renderTorre();
     updateBadges();
     const _dm = document.getElementById('dash-month');
@@ -1854,8 +1864,12 @@ function verTorre(id){
     </div>
     <div class="ver-grid" style="grid-template-columns:1fr 1fr;padding-bottom:20px">
       <div class="ver-money" style="border-color:color-mix(in srgb,var(--orange) 30%,transparent)">
-        <div class="ver-money-lbl">Custo da Torre</div>
+        <div class="ver-money-lbl">Custo Unit.</div>
         <div class="ver-money-val" style="color:var(--orange)">${fmt(r.custo||0)}</div>
+      </div>
+      <div class="ver-money" style="border-color:color-mix(in srgb,var(--red) 30%,transparent)">
+        <div class="ver-money-lbl">Custo Total Empresa</div>
+        <div class="ver-money-val" style="color:var(--red)">${fmt(r.custoTotal||(r.qtd||0)*(r.custo||0))}</div>
       </div>
       <div class="ver-money" style="border-color:color-mix(in srgb,var(--green) 30%,transparent)">
         <div class="ver-money-lbl">Val. Cobrado Cliente</div>
@@ -2589,7 +2603,10 @@ function renderTorre(){
         </div>
       </td>
       <td><span class="badge bg-blue">${_normFilial(r.filial)||'—'}</span></td>
-      <td style="font-family:var(--mono);color:var(--orange);font-weight:700">${fmt(r.custo||0)}</td>
+      <td style="font-family:var(--mono);color:var(--orange);font-weight:700" title="Custo unit.: ${fmt(r.custo||0)} × ${r.qtd||0} torres">
+        ${fmt(r.custoTotal||(r.qtd||0)*(r.custo||0))}
+        <div style="font-size:10px;color:var(--text3);font-weight:600">${fmt(r.custo||0)}/un</div>
+      </td>
       <td style="text-align:center;white-space:nowrap">
         ${(r.gratificadas>0)
           ? `<span title="${r.qtd||0} torres · ${r.gratificadas} gratificada(s) · ${Math.max(0,(r.qtd||0)-(r.gratificadas||0))} cobrada(s)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--blue-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help">
@@ -2629,7 +2646,7 @@ function renderTorre(){
     <div style="display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;border-top:2px solid var(--border)">
       <div class="tf-item"><span>Instaladas</span><strong style="color:var(--blue)">${totalInst}</strong></div>
       <div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div>
-      <div class="tf-item"><span>Custo Total</span><strong style="color:var(--orange)">${fmt(sum(at,'custo'))}</strong></div>
+      <div class="tf-item"><span>Custo Total Empresa</span><strong style="color:var(--orange)">${fmt(at.reduce((s,r)=>s+(r.custoTotal||(r.qtd||0)*(r.custo||0)),0))}</strong></div>
       <div class="tf-item"><span>Val. Cobrado</span><strong style="color:var(--green)">${fmt(sum(at,'vcliente'))}</strong></div>
     </div>`+tfEl.innerHTML;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
