@@ -548,6 +548,8 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid">
     <div class="fgroup"><label>Custo da Torre (R$) *</label><input type="number" id="t-custo" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
+  <div class="fgroup"><label style="color:var(--orange)">💰 Custo Total Empresa</label><input id="t-custo-total" readonly style="color:var(--orange);font-weight:800;background:var(--surface2)" placeholder="Calculado auto."></div>
+  <div class="fgroup" style="grid-column:1/-1"><small id="t-cobradas-info" style="font-size:12px"></small></div>
     <div class="fgroup"><label>Val. Cobrado Cliente (R$)</label><input type="number" id="t-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
     <div class="fgroup"><label>Val. Cobrado Cliente</label><input id="t-total" readonly style="color:var(--green);font-weight:800"></div>
   </div></div>
@@ -1310,7 +1312,18 @@ function updateStatusColor(id){
 const gi=id=>{const el=document.getElementById(id);return el?el.value.trim():''};
 const gn=id=>Number(gi(id))||0;
 function calcM(){const tc=gn('m-qcam')*gn('m-vcam'),ti=gn('m-qintel')*gn('m-vintel'),tt=gn('m-qtl')*gn('m-vtl');document.getElementById('m-tcam').value=fmt(tc);document.getElementById('m-tintel').value=fmt(ti);document.getElementById('m-ttl').value=fmt(tt);document.getElementById('m-total').value=fmt(tc+ti+tt);}
-function calcT(){document.getElementById('t-total').value=fmt(gn('t-vcliente'));}
+function calcT(){
+  const qtd=gn('t-qtd'),grat=gn('t-gratificadas')||0,custo=gn('t-custo');
+  const cobradas=Math.max(0,qtd-grat);
+  const custoEmpresa=qtd*custo;
+  const el=document.getElementById('t-cobradas-info');
+  if(el) el.innerHTML=grat>0
+    ?'<span style="color:var(--amber)">⭐ '+grat+' gratificada'+(grat>1?'s':'')+' · Cobradas ao cliente: '+cobradas+'</span><br><span style="color:var(--orange)">Custo empresa: '+fmt(custoEmpresa)+'</span>'
+    :(custoEmpresa>0?'<span style="color:var(--orange)">Custo empresa: '+fmt(custoEmpresa)+'</span>':'');
+  const ctEl=document.getElementById('t-custo-total');
+  if(ctEl) ctEl.value=fmt(custoEmpresa);
+  document.getElementById('t-total').value=fmt(gn('t-vcliente'));
+}
 function calcE(){document.getElementById('e-total').value=fmt(gn('e-qtd')*gn('e-unit'));}
 function calcA(){document.getElementById('a-total').value=fmt(gn('a-vcliente'));}
 function calcSG(){document.getElementById('sg-total').value=fmt(gn('sg-qtd')*gn('sg-unit'));}
@@ -2239,7 +2252,7 @@ function renderTorre(){
   document.getElementById('tf-torre').innerHTML=`
     <div class="tf-item"><span>Instaladas</span><strong style="color:var(--blue)">${totalInst}</strong></div>
     <div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div>
-    <div class="tf-item"><span>Custo Total</span><strong style="color:var(--orange)">${fmt(sum(at,'custo'))}</strong></div>
+    <div class="tf-item"><span>💰 Custo Empresa</span><strong style="color:var(--orange)" title="Todas as torres × custo unitário (incl. gratificadas)">${fmt(at.reduce((s,r)=>s+(Number(r.qtd)||0)*(Number(r.custo)||0),0))}</strong></div>
     <div class="tf-item"><span>Val. Cobrado Clientes</span><strong style="color:var(--green)">${fmt(sum(at,'vcliente'))}</strong></div>
   `;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
