@@ -213,7 +213,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 /* ── LOADING OVERLAY ── */
-#loading-screen{position:fixed;inset:0;z-index:9999;background:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
+#loading-screen{position:fixed;inset:0;z-index:9999;background:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #loading-screen.hidden{opacity:0;pointer-events:none}
 .loading-logo{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;border:2px solid rgba(255,255,255,.35);margin-bottom:4px}
 .loading-title{font-size:18px;font-weight:800;color:#fff}
@@ -932,7 +932,7 @@ function setLoadingMsg(msg){
 }
 function hideLoading(){
   const el=document.getElementById('loading-screen');
-  if(el){el.classList.add('hidden');setTimeout(()=>{el.style.display='none';},500);}
+  if(el){el.style.display='none';}
 }
 
 // ══════════════════════════════════════════
@@ -963,9 +963,8 @@ function save(){
 }
 function load(){
   try{
-    // Tenta localStorage primeiro, depois sessionStorage
     let r=null;
-    try{ r=localStorage.getItem(KEY); }catch(e){ console.warn('[load] localStorage bloqueado'); }
+    try{ r=localStorage.getItem(KEY); }catch(e){}
     if(!r){ try{ r=sessionStorage.getItem(KEY); }catch(e){} }
     if(!r)return false;
     const d=JSON.parse(r);
@@ -3041,14 +3040,17 @@ async function init(){
       renderAll();
     }, 2000);
   }else{
+    // Sem cache: mostra UI vazia imediatamente, carrega em background
+    renderAll();
+    hideLoading();
     setLoadingMsg('Conectando ao Supabase…');
     try{
       await loadFromSupabase();
+      renderAll();
     }catch(e){
       console.error(e);
+      showToast('Erro ao conectar ao Supabase','error');
     }
-    renderAll();
-    hideLoading();
   }
 }
 
