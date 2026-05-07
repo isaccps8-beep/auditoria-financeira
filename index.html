@@ -1268,7 +1268,8 @@ function normalizeRecord(table, row){
     // Mapeia todos os campos conhecidos
     r.vcliente  = Number(r.vcliente  || r.val_cliente || r.valor_cliente || r.valcliente || r.v_cliente || 0);
     r.custo     = Number(r.custo     || r.custo_torre  || r.custoTorre   || 0);
-    r.custoTotal= Number(r.custoTotal || r.custo_total  || 0) || (r.qtd||0)*(r.custo||0);
+    // custoTotal calculado localmente, não enviado ao Supabase
+    r._custoTotal= Number(r._custoTotal || r.custo_total  || 0) || (r.qtd||0)*(r.custo||0);
     r.qtd       = Number(r.qtd       || r.qtd_torres   || r.qtdTorres    || 0);
     r.cameras   = Number(r.cameras   || r.qtd_cameras  || r.qtdCameras   || 0);
     r.intels    = Number(r.intels    || r.qtd_intels   || r.qtdIntels    || 0);
@@ -1621,8 +1622,9 @@ function upsert(t,rec){
   save();updateBadges();
   if(final){
     _pendingIds.add(final.id);
-    saveToSupabase(t,final).then(()=>{
-      // Após confirmação do servidor, remove do pending
+    // Remove campos locais (prefixo _) antes de enviar ao Supabase
+    const _toSend=Object.fromEntries(Object.entries(final).filter(([k])=>!k.startsWith('_')));
+    saveToSupabase(t,_toSend).then(()=>{
       setTimeout(()=>_pendingIds.delete(final.id), 5000);
     });
   }
@@ -1888,7 +1890,7 @@ function verTorre(id){
       </div>
       <div class="ver-money" style="border-color:color-mix(in srgb,var(--red) 30%,transparent)">
         <div class="ver-money-lbl">Custo Total Empresa</div>
-        <div class="ver-money-val" style="color:var(--red)">${fmt(r.custoTotal||(r.qtd||0)*(r.custo||0))}</div>
+        <div class="ver-money-val" style="color:var(--red)">${fmt(r._custoTotal||(r.qtd||0)*(r.custo||0))}</div>
       </div>
       <div class="ver-money" style="border-color:color-mix(in srgb,var(--green) 30%,transparent)">
         <div class="ver-money-lbl">Val. Cobrado Cliente</div>
@@ -2623,7 +2625,7 @@ function renderTorre(){
       </td>
       <td><span class="badge bg-blue">${_normFilial(r.filial)||'—'}</span></td>
       <td style="font-family:var(--mono);color:var(--orange);font-weight:700" title="Custo unit.: ${fmt(r.custo||0)} × ${r.qtd||0} torres">
-        ${fmt(r.custoTotal||(r.qtd||0)*(r.custo||0))}
+        ${fmt(r._custoTotal||(r.qtd||0)*(r.custo||0))}
         <div style="font-size:10px;color:var(--text3);font-weight:600">${fmt(r.custo||0)}/un</div>
       </td>
       <td style="text-align:center;white-space:nowrap">
@@ -2665,7 +2667,7 @@ function renderTorre(){
     <div style="display:flex;gap:16px;flex-wrap:wrap;padding:10px 14px;border-top:2px solid var(--border)">
       <div class="tf-item"><span>Instaladas</span><strong style="color:var(--blue)">${totalInst}</strong></div>
       <div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div>
-      <div class="tf-item"><span>Custo Total Empresa</span><strong style="color:var(--orange)">${fmt(at.reduce((s,r)=>s+(r.custoTotal||(r.qtd||0)*(r.custo||0)),0))}</strong></div>
+      <div class="tf-item"><span>Custo Total Empresa</span><strong style="color:var(--orange)">${fmt(at.reduce((s,r)=>s+(r._custoTotal||(r.qtd||0)*(r.custo||0)),0))}</strong></div>
       <div class="tf-item"><span>Val. Cobrado</span><strong style="color:var(--green)">${fmt(sum(at,'vcliente'))}</strong></div>
     </div>`+tfEl.innerHTML;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
@@ -3673,7 +3675,8 @@ async function pushAllToSupabase(){
   let count=0;
   for(const t of TABLES){
     for(const r of DB[t]){
-      await saveToSupabase(t,r);
+      const _toSend=Object.fromEntries(Object.entries(r).filter(([k])=>!k.startsWith('_')));
+      await saveToSupabase(t,_toSend);
       count++;
     }
   }
