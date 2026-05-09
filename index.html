@@ -1901,16 +1901,22 @@ function renderEstoqueFiliais(tipo){
   const corT=tipo==='torre'?'var(--blue-t)':'var(--purple-t)';
 
   const pendPF={};
+  const inativoPF={}; // torres inativas = disponíveis fisicamente
   if(tipo==='torre'){
     DB.torre.filter(r=>r.status==='ativo').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
-      if(!f) return; // ignora torres sem filial definida
+      if(!f) return;
       instPF[f]=(instPF[f]||0)+(Number(r.qtd)||0);
     });
     DB.torre.filter(r=>r.status==='pendente').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
       if(!f) return;
       pendPF[f]=(pendPF[f]||0)+(Number(r.qtd)||0);
+    });
+    DB.torre.filter(r=>r.status==='inativo').forEach(r=>{
+      const f=_normFilial((r.filial||'').trim());
+      if(!f) return;
+      inativoPF[f]=(inativoPF[f]||0)+(Number(r.qtd)||0);
     });
   }else{
     DB.armario.filter(r=>r.status==='ativo').forEach(r=>{
@@ -1932,14 +1938,14 @@ function renderEstoqueFiliais(tipo){
   // Substitui EST local com versão normalizada
   Object.keys(EST[tipo]).forEach(k=>{ const nk=_normFilial(k)||k; if(nk!==k){ EST[tipo][nk]=EST[tipo][k]; delete EST[tipo][k]; } });
 
-  const todas=[...new Set([...FILIAIS,...Object.keys(estNorm),...Object.keys(instPF),...Object.keys(pendPF)])];
+  const todas=[...new Set([...FILIAIS,...Object.keys(estNorm),...Object.keys(instPF),...Object.keys(pendPF),...Object.keys(inativoPF)])];
   const grid=document.getElementById(`${pfx}-filiais-grid`);
   const resumoEl=document.getElementById(`${pfx}-resumo-geral`);
 
   // Totais gerais
   const totalInst=todas.reduce((s,f)=>s+(instPF[f]||0),0);
   const totalPend=todas.reduce((s,f)=>s+(pendPF[f]||0),0);
-  const totalDisp=todas.reduce((s,f)=>s+((estNorm[f]||{}).disponivel||0),0);
+  const totalDisp=todas.reduce((s,f)=>s+Math.max((estNorm[f]||{}).disponivel||0,inativoPF[f]||0),0);
   const totalGeral=totalInst+totalPend+totalDisp;
   if(resumoEl){
     resumoEl.innerHTML=`
@@ -1970,7 +1976,8 @@ function renderEstoqueFiliais(tipo){
     const e=estNorm[f]||{disponivel:0,minimo:0};
     const inst=instPF[f]||0;
     const pend=pendPF[f]||0;
-    const disp=e.disponivel||0;
+    // Disponível = max entre EST.disponivel e torres inativas no DB
+    const disp=Math.max(e.disponivel||0, inativoPF[f]||0);
     const min=e.minimo||0;
     const alerta=min>0&&disp<=min;
     const total=inst+pend+disp;
