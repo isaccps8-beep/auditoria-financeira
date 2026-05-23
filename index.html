@@ -1121,7 +1121,6 @@ function goTab(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='dash')renderDash();
-  if(id==='monuv')renderMonuv();
   if(id==='torre')renderTorre();
   if(id==='terc'){renderTerc();renderTercPivot();}
   if(id==='armario')renderArmario();
@@ -1132,8 +1131,8 @@ function goTab(id,btn){
 // ══════════════════════════════════════════
 // MODAIS
 // ══════════════════════════════════════════
-const _ed={monuv:null,torre:null,terc:null,armario:null,segware:null,selbit:null};
-const MOD_LABELS={monuv:'Monuv',torre:'Torre',terc:'Terceirizada',armario:'Armário',segware:'Segware',selbit:'Selbetti'};
+const _ed={torre:null,terc:null,armario:null,segware:null,selbit:null};
+const MOD_LABELS={torre:'Torre',terc:'Terceirizada',armario:'Armário',segware:'Segware',selbit:'Selbetti'};
 
 function populateFilialSelects(){['t-filial','a-filial'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">— Selecione —</option>'+FILIAIS.map(f=>`<option value="${f}">${f}</option>`).join('');});}
 
@@ -1160,7 +1159,6 @@ function clearForm(t){
 }
 function fillForm(t,r){
   (FIELDS[t]||[]).forEach(([id,k])=>{const el=document.getElementById(id);if(el&&r[k]!==undefined)el.value=r[k];});
-  if(t==='monuv')calcM();
   if(t==='torre'){
     const _gEl=document.getElementById('t-gratificadas');
     if(_gEl) _gEl.value=r.gratificadas||0;
@@ -1228,8 +1226,7 @@ function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn
 // SAVE RECORDS
 // ══════════════════════════════════════════
 function saveRecord(type){
-  if(type==='monuv'){const mid=gi('m-id'),fantasia=gi('m-fantasia'),datacad=gi('m-datacad');if(!mid||!fantasia||!datacad)return alert('Preencha ID, Fantasia e Data.');if(!_ed.monuv&&DB.monuv.find(r=>r.mid===mid))return alert('ID já existe.');const qCam=gn('m-qcam'),qIntel=gn('m-qintel'),qTL=gn('m-qtl'),vCam=gn('m-vcam'),vIntel=gn('m-vintel'),vTL=gn('m-vtl'),totCam=qCam*vCam,totIntel=qIntel*vIntel,totTL=qTL*vTL;upsert('monuv',{mid,fantasia,filial:gi('m-filial'),datacad,status:gi('m-status'),qCam,qIntel,qTL,vCam,vIntel,vTL,totCam,totIntel,totTL,total:totCam+totIntel+totTL});closeModal('monuv');renderMonuv();updateBadges();const _dm2=document.getElementById('dash-month');if(!_dm2.value)_dm2.value=nowM();renderDash();}
-  else if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
+  if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
     renderTorre();
     updateBadges();
     const _dm = document.getElementById('dash-month');
@@ -2242,7 +2239,7 @@ function _renderDashNow(){
   const vsl=svc==='all'||svc==='selbit'?totSelbit(period):0;
   const tot=vm+vt+ve+va+vs+vsl;
 
-  const pvm=cP&&(svc==='all'||svc==='monuv')?totMonuv():null;
+  const pvm=null;
   const pvt=cP&&(svc==='all'||svc==='torre')?totTorre():null;
   const pve=cP&&(svc==='all'||svc==='terc')?totTerc(cP):null;
   const pva=cP&&(svc==='all'||svc==='armario')?totArmario():null;
@@ -2315,7 +2312,6 @@ function buildLine(period,svc){
   } else {
     // Módulo selecionado: linha grossa com preenchimento
     const cfg={
-      monuv:   {label:'Monuv',         data:pr.map(()=>totMonuv()),   col:COLS.monuv},
       torre:   {label:'Torre',          data:pr.map(()=>totTorre()),   col:COLS.torre},
       terc:    {label:'Terceirizadas',  data:pr.map(p=>totTerc(p)),    col:COLS.terc},
       armario: {label:'Armários',       data:pr.map(()=>totArmario()), col:COLS.armario},
@@ -2556,7 +2552,6 @@ function buildTercLine(period,svc){
   if(svc&&svc!=='all'&&svc!=='terc'){
     // Módulo não é terc: mostra evolução do módulo nos 6 meses
     const cfg={
-      monuv:   {fn:()=>totMonuv(),   col:COLS.monuv,   lbl:'Monuv'},
       torre:   {fn:()=>totTorre(),   col:COLS.torre,   lbl:'Torre'},
       armario: {fn:()=>totArmario(), col:COLS.armario, lbl:'Armários'},
       segware: {fn:p=>totSegware(p), col:COLS.segware,  lbl:'Segware'},
@@ -2608,7 +2603,6 @@ function buildTABar(period,svc){
   if(svc&&!['all','torre','armario','segware','selbit'].includes(svc)){
     // módulo que não pertence a este gráfico (monuv/terc): mostra esse módulo
     const cfg={
-      monuv:{fn:()=>totMonuv(),col:COLS.monuv,lbl:'Monuv'},
       terc: {fn:p=>totTerc(p), col:COLS.terc, lbl:'Terceirizadas'},
     };
     const c=cfg[svc];
@@ -2658,7 +2652,6 @@ function buildComp(vm,vt,ve,va,vs,vsl,cP){
   const tot=vm+vt+ve+va+vs+vsl||1;
   const curSvc=document.getElementById('dash-svc').value||'all';
   const items=[
-    {n:'Monuv',v:vm,p:cP?totMonuv():null,col:COLS.monuv,svc:'monuv'},
     {n:'Torre',v:vt,p:cP?totTorre():null,col:COLS.torre,svc:'torre'},
     {n:'Terceirizadas',v:ve,p:cP?totTerc(cP):null,col:COLS.terc,svc:'terc'},
     {n:'Armários',v:va,p:cP?totArmario():null,col:COLS.armario,svc:'armario'},
