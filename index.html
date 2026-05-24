@@ -489,6 +489,56 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 
 
 
+<!-- MODAL TORRE -->
+<div class="overlay" id="modal-torre">
+  <div class="modal" style="width:min(780px,100%)">
+    <div class="modal-hdr">
+      <div><div class="modal-title" id="modal-torre-title">Nova Torre</div><div class="modal-sub">* obrigatórios</div></div>
+      <button class="btn btn-ghost" onclick="closeModal('torre')" style="height:30px;width:30px;padding:0;font-size:16px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="sec"><div class="sec-lbl" style="color:var(--blue)">Identificação</div>
+        <div class="fg-grid">
+          <div class="fgroup" style="grid-column:1/-1"><label>Cliente *</label><input id="t-cliente" placeholder="Nome do cliente"></div>
+          <div class="fgroup"><label>Filial</label><select id="t-filial"></select></div>
+          <div class="fgroup"><label>Status</label><select id="t-status" onchange="updateStatusColor('t-status')"><option value="ativo">Ativo</option><option value="pendente">Pendente</option><option value="inativo">Inativo</option></select></div>
+          <div class="fgroup"><label>Tipo</label><select id="t-tipo"><option value="">— Selecione —</option><option value="Portaria">Portaria</option><option value="Alarme">Alarme</option></select></div>
+          <div class="fgroup"><label>Contrato</label><select id="t-contrato"><option value="Não">Não</option><option value="Sim">Sim</option></select></div>
+          <div class="fgroup"><label>Data Instalação</label><input type="date" id="t-data"></div>
+        </div>
+      </div>
+      <div class="sec"><div class="sec-lbl" style="color:var(--cyan)">Equipamentos</div>
+        <div class="fg-grid">
+          <div class="fgroup"><label>Qtd. Torres</label><input type="number" id="t-qtd" min="0" placeholder="0" oninput="calcT()"></div>
+          <div class="fgroup"><label style="color:var(--amber)">⭐ Torres Gratificadas</label><input type="number" id="t-gratificadas" min="0" value="0" placeholder="0" oninput="calcT()" style="border-color:var(--amber);border-width:2px"></div>
+          <div class="fgroup" style="grid-column:1/-1"><small id="t-cobradas-info" style="font-size:12px"></small></div>
+          <div class="fgroup"><label>Câmeras</label><input type="number" id="t-cameras" min="0" placeholder="0"></div>
+          <div class="fgroup"><label>Intel.</label><input type="number" id="t-intels" min="0" placeholder="0"></div>
+          <div class="fgroup"><label>Tipo de Inteligência</label><select id="t-tipo-intel"><option value="">— Selecione —</option><option value="Octos">Octos</option><option value="SegwareAI">SegwareAI</option></select></div>
+        </div>
+      </div>
+      <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div>
+        <div class="fg-grid">
+          <div class="fgroup"><label>Custo da Torre (R$) *</label><input type="number" id="t-custo" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
+          <div class="fgroup"><label style="color:var(--orange)">💰 Custo Total Empresa</label><input id="t-custo-total" readonly style="color:var(--orange);font-weight:800;background:var(--surface2)" placeholder="Calculado auto."></div>
+          <div class="fgroup"><label>Val. Cobrado Cliente (R$) *</label><input type="number" id="t-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcT()"></div>
+          <div class="fgroup"><label>Val. Cobrado Cliente</label><input id="t-total" readonly style="color:var(--green);font-weight:800"></div>
+        </div>
+      </div>
+      <div class="sec"><div class="sec-lbl" style="color:var(--text3)">Localização</div>
+        <div class="fg-grid">
+          <div class="fgroup" style="grid-column:1/-1"><label>Endereço</label><input id="t-endereco" placeholder="Endereço completo"></div>
+          <div class="fgroup" style="grid-column:1/-1"><label>Observações</label><textarea id="t-obs" rows="2" placeholder="Anotações…" style="width:100%;resize:vertical;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px"></textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn btn-ghost" onclick="closeModal('torre')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveRecord('torre')">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL TERC -->
 <div class="overlay" id="modal-terc"><div class="modal modal-sm"><div class="modal-hdr"><div><div class="modal-title" id="modal-terc-title">Novo — Terceirizada</div><div class="modal-sub">Medição mensal</div></div><button class="hbtn-icon" onclick="closeModal('terc')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body"><div class="fg-grid"><div class="fgroup"><label>Código *</label><input id="e-cod" placeholder="TERC-001"></div><div class="fgroup"><label>Empresa *</label><input id="e-emp" placeholder="Nome"></div><div class="fgroup"><label>Qtd. Clientes *</label><input type="number" id="e-qtd" min="0" placeholder="0" oninput="calcE()"></div><div class="fgroup"><label>Val. Unit. (R$) *</label><input type="number" id="e-unit" min="0" step=".01" placeholder="0,00" oninput="calcE()"></div><div class="fgroup"><label>Período *</label><input type="month" id="e-per"></div><div class="fgroup"><label>Total</label><input id="e-total" readonly style="color:var(--orange);font-weight:800"></div></div></div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('terc')">Cancelar</button><button class="btn btn-primary" onclick="saveRecord('terc')">💾 Salvar</button></div></div></div>
 
