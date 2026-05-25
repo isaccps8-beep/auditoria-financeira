@@ -1917,7 +1917,12 @@ function renderEstoqueFiliais(tipo){
     DB.armario.filter(r=>r.status==='pendente').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
       if(!f) return;
-      pendPF[f]=(pendPF[f]||0)+1; // conta unidades de armário
+      pendPF[f]=(pendPF[f]||0)+1;
+    });
+    DB.armario.filter(r=>r.status==='inativo').forEach(r=>{
+      const f=_normFilial((r.filial||'').trim());
+      if(!f) return;
+      inativoPF[f]=(inativoPF[f]||0)+1;
     });
   }
 
@@ -1966,8 +1971,15 @@ function renderEstoqueFiliais(tipo){
     const e=estNorm[f]||{disponivel:0,minimo:0};
     const inst=instPF[f]||0;
     const pend=pendPF[f]||0;
-    // Disponível = max entre EST.disponivel e torres inativas no DB
-    const disp=Math.max(e.disponivel||0, inativoPF[f]||0);
+    // Disponível:
+    // - Para torre: max(EST.disponivel, inativas no DB)
+    // - Para armario: inativas no DB + adições manuais (EST.disponivel)
+    //   Se não há inativas e EST tem valor residual errado, usa só inativas
+    const disp = tipo==='torre'
+      ? Math.max(e.disponivel||0, inativoPF[f]||0)
+      : (inativoPF[f]||0) > 0
+        ? (inativoPF[f]||0) + Math.max(0,(e.disponivel||0))
+        : (e.disponivel||0);
     const min=e.minimo||0;
     const alerta=min>0&&disp<=min;
     const total=inst+pend+disp;
