@@ -161,6 +161,39 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 .est-filial-card.alert-low.selected{border-color:var(--red);box-shadow:0 0 0 3px color-mix(in srgb,var(--red) 15%,transparent)}
 .est-filial-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
 .est-filial-name{font-size:15px;font-weight:800;color:var(--text)}
+
+/* ══ ESTOQUE REDESENHADO v2 ══ */
+.est-card2{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.est-card2:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.est-card2.alert-low{border-color:var(--red);background:linear-gradient(135deg,var(--red-l),var(--surface))}
+.est-card2-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.est-card2-title{display:flex;flex-direction:column;gap:6px}
+.est-card2-flag{font-size:16px;font-weight:900;letter-spacing:-.3px;color:var(--text)}
+.est-chip{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;width:fit-content;text-transform:uppercase;letter-spacing:.4px}
+.est-chip-green{background:var(--green-l);color:var(--green)}
+.est-chip-amber{background:var(--amber-l);color:var(--amber)}
+.est-chip-red{background:var(--red-l);color:var(--red)}
+.est-card2-total{display:flex;flex-direction:column;align-items:flex-end;line-height:1}
+.est-card2-total-num{font-size:30px;font-weight:900;font-family:var(--mono);color:var(--text)}
+.est-card2-total-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);margin-top:2px}
+.est-bar2{display:flex;height:10px;border-radius:6px;overflow:hidden;background:var(--surface2);margin-bottom:12px;gap:2px}
+.est-bar2-seg{transition:width .5s cubic-bezier(.4,0,.2,1);border-radius:3px}
+.est-legend2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.est-legend2-item{display:flex;flex-direction:column;gap:2px;padding:8px;background:var(--surface2);border-radius:9px;text-align:center;align-items:center}
+.est-legend2-dot{width:8px;height:8px;border-radius:50%;margin-bottom:2px}
+.est-legend2-num{font-size:20px;font-weight:900;font-family:var(--mono);line-height:1}
+.est-legend2-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;line-height:1.2}
+.est-card2-foot{display:flex;align-items:center;justify-content:space-between}
+.est-hero{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.est-hero-main{background:var(--surface2);border-radius:12px;padding:16px 14px;position:relative}
+.est-hero-total{border-left:4px solid var(--text3)}
+.est-hero-num{font-size:32px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:4px}
+.est-hero-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--text3)}
+.est-hero-bar{height:4px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden}
+.est-hero-bar>div{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+@media(max-width:640px){.est-hero{grid-template-columns:1fr 1fr}.est-legend2{grid-template-columns:1fr 1fr 1fr}}
+
+
 .est-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
 .est-stat-box{display:flex;flex-direction:column;align-items:center;padding:14px 8px;border-top:1px solid var(--border);position:relative}
 .est-stat-box:not(:last-child){border-right:1px solid var(--border)}
@@ -608,7 +641,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
         <!-- Resumo geral -->
         <div id="et-resumo-geral" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
         <!-- Grid de filiais -->
-        <div id="et-filiais-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+        <div id="et-filiais-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
         <!-- Form de adição (aparece ao clicar filial) -->
         <div class="est-add-form" id="et-add-form">
           <div class="est-add-title">
@@ -699,7 +732,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
       </div>
       <div id="ea-painel-est">
         <div id="ea-resumo-geral" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
-        <div id="ea-filiais-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+        <div id="ea-filiais-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
         <div class="est-add-form" id="ea-add-form">
           <div class="est-add-title">
             <span id="ea-add-form-title">➕ Adicionar ao Estoque</span>
@@ -1952,22 +1985,30 @@ function renderEstoqueFiliais(tipo){
   const totalDisp=todas.reduce((s,f)=>s+Math.max((estNorm[f]||{}).disponivel||0,inativoPF[f]||0),0);
   const totalGeral=totalInst+totalPend+totalDisp;
   if(resumoEl){
+    const lbl=tipo==='torre'?'Torres':'Armários';
+    const maxV=Math.max(totalInst,totalPend,totalDisp,1);
     resumoEl.innerHTML=`
-      <div style="background:${corL};border:1.5px solid color-mix(in srgb,${cor} 25%,transparent);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:${corT};margin-bottom:6px">${tipo==='torre'?'Torres':'Armários'} Instalad${tipo==='torre'?'as':'os'}</div>
-        <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:${cor}">${totalInst}</div>
-      </div>
-      <div style="background:var(--amber-l);border:1.5px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--amber-t);margin-bottom:6px">Pendentes</div>
-        <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--amber)">${totalPend}</div>
-      </div>
-      <div style="background:var(--green-l);border:1.5px solid color-mix(in srgb,var(--green) 25%,transparent);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--green-t);margin-bottom:6px">Em Estoque</div>
-        <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--green)">${totalDisp}</div>
-      </div>
-      <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px">Total Geral</div>
-        <div style="font-size:28px;font-weight:800;font-family:var(--mono)">${totalGeral}</div>
+      <div class="est-hero">
+        <div class="est-hero-main" style="border-left:4px solid ${cor}">
+          <div class="est-hero-num" style="color:${cor}">${totalInst}</div>
+          <div class="est-hero-lbl">${lbl} Instalad${tipo==='torre'?'as':'os'}</div>
+          <div class="est-hero-bar"><div style="width:${Math.round(totalInst/maxV*100)}%;background:${cor}"></div></div>
+        </div>
+        <div class="est-hero-main" style="border-left:4px solid var(--amber)">
+          <div class="est-hero-num" style="color:var(--amber)">${totalPend}</div>
+          <div class="est-hero-lbl">Pendentes</div>
+          <div class="est-hero-bar"><div style="width:${Math.round(totalPend/maxV*100)}%;background:var(--amber)"></div></div>
+        </div>
+        <div class="est-hero-main" style="border-left:4px solid var(--green)">
+          <div class="est-hero-num" style="color:var(--green)">${totalDisp}</div>
+          <div class="est-hero-lbl">Em Estoque</div>
+          <div class="est-hero-bar"><div style="width:${Math.round(totalDisp/maxV*100)}%;background:var(--green)"></div></div>
+        </div>
+        <div class="est-hero-main est-hero-total">
+          <div class="est-hero-num">${totalGeral}</div>
+          <div class="est-hero-lbl">Total Geral</div>
+          <div style="font-size:10px;color:var(--text3);font-weight:700;margin-top:6px">${todas.filter(f=>(instPF[f]||0)+(pendPF[f]||0)+Math.max((estNorm[f]||{}).disponivel||0,inativoPF[f]||0)>0).length} filiais ativas</div>
+        </div>
       </div>`;
   }
 
