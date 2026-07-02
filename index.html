@@ -191,8 +191,8 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 .est-summary-total-lbl{font-size:12px;font-weight:700;color:var(--text3)}
 .est-summary-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;background:var(--surface);gap:3px;margin-bottom:16px}
 .est-summary-seg{transition:width .6s cubic-bezier(.4,0,.2,1);border-radius:4px;min-width:3px}
-.est-summary-legend{display:flex;gap:28px;flex-wrap:wrap}
-.est-summary-item{display:flex;align-items:center;gap:8px}
+.est-summary-legend{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.est-summary-item{display:flex;align-items:center;gap:8px;justify-content:center;background:var(--surface);border-radius:10px;padding:10px 14px}
 .est-summary-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .est-summary-val{font-size:22px;font-weight:900;font-family:var(--mono);line-height:1}
 .est-summary-txt{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
@@ -644,7 +644,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
       <!-- PAINEL ESTOQUE -->
       <div id="et-painel-est">
         <!-- Resumo geral -->
-        <div id="et-resumo-geral" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
+        <div id="et-resumo-geral" style="margin-bottom:4px"></div>
         <!-- Grid de filiais -->
         <div id="et-filiais-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
         <!-- Form de adição (aparece ao clicar filial) -->
@@ -736,7 +736,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
         <button class="est-tab-btn" id="ea-btn-hist" onclick="estAba('armario','hist')" style="flex:1;color:var(--text3)">🕐 Histórico</button>
       </div>
       <div id="ea-painel-est">
-        <div id="ea-resumo-geral" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:4px"></div>
+        <div id="ea-resumo-geral" style="margin-bottom:4px"></div>
         <div id="ea-filiais-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px"></div>
         <div class="est-add-form" id="ea-add-form">
           <div class="est-add-title">
