@@ -1991,28 +1991,41 @@ function renderEstoqueFiliais(tipo){
   const totalGeral=totalInst+totalPend+totalDisp;
   if(resumoEl){
     const lbl=tipo==='torre'?'Torres':'Armários';
-    const maxV=Math.max(totalInst,totalPend,totalDisp,1);
+    const tGeral=totalInst+totalPend+totalDisp;
+    const pI=tGeral>0?Math.round(totalInst/tGeral*100):0;
+    const pP=tGeral>0?Math.round(totalPend/tGeral*100):0;
+    const pD=tGeral>0?Math.round(totalDisp/tGeral*100):0;
+    const filiaisAtivas=todas.filter(f=>(instPF[f]||0)+(pendPF[f]||0)+Math.max((estNorm[f]||{}).disponivel||0,inativoPF[f]||0)>0).length;
     resumoEl.innerHTML=`
-      <div class="est-hero">
-        <div class="est-hero-main" style="border-left:4px solid ${cor}">
-          <div class="est-hero-num" style="color:${cor}">${totalInst}</div>
-          <div class="est-hero-lbl">${lbl} Instalad${tipo==='torre'?'as':'os'}</div>
-          <div class="est-hero-bar"><div style="width:${Math.round(totalInst/maxV*100)}%;background:${cor}"></div></div>
+      <div class="est-summary">
+        <div class="est-summary-head">
+          <div class="est-summary-total">
+            <span class="est-summary-total-num">${tGeral}</span>
+            <span class="est-summary-total-lbl">${lbl} no total · ${filiaisAtivas} filiais ativas</span>
+          </div>
         </div>
-        <div class="est-hero-main" style="border-left:4px solid var(--amber)">
-          <div class="est-hero-num" style="color:var(--amber)">${totalPend}</div>
-          <div class="est-hero-lbl">Pendentes</div>
-          <div class="est-hero-bar"><div style="width:${Math.round(totalPend/maxV*100)}%;background:var(--amber)"></div></div>
+        <div class="est-summary-bar">
+          ${totalInst>0?`<div class="est-summary-seg" style="width:${pI}%;background:${cor}"></div>`:''}
+          ${totalPend>0?`<div class="est-summary-seg" style="width:${pP}%;background:var(--amber)"></div>`:''}
+          ${totalDisp>0?`<div class="est-summary-seg" style="width:${pD}%;background:var(--green)"></div>`:''}
+          ${tGeral===0?`<div class="est-summary-seg" style="width:100%;background:var(--border)"></div>`:''}
         </div>
-        <div class="est-hero-main" style="border-left:4px solid var(--green)">
-          <div class="est-hero-num" style="color:var(--green)">${totalDisp}</div>
-          <div class="est-hero-lbl">Em Estoque</div>
-          <div class="est-hero-bar"><div style="width:${Math.round(totalDisp/maxV*100)}%;background:var(--green)"></div></div>
-        </div>
-        <div class="est-hero-main est-hero-total">
-          <div class="est-hero-num">${totalGeral}</div>
-          <div class="est-hero-lbl">Total Geral</div>
-          <div style="font-size:10px;color:var(--text3);font-weight:700;margin-top:6px">${todas.filter(f=>(instPF[f]||0)+(pendPF[f]||0)+Math.max((estNorm[f]||{}).disponivel||0,inativoPF[f]||0)>0).length} filiais ativas</div>
+        <div class="est-summary-legend">
+          <div class="est-summary-item">
+            <span class="est-summary-dot" style="background:${cor}"></span>
+            <span class="est-summary-val" style="color:${cor}">${totalInst}</span>
+            <span class="est-summary-txt">Instalad${tipo==='torre'?'as':'os'}</span>
+          </div>
+          <div class="est-summary-item">
+            <span class="est-summary-dot" style="background:var(--amber)"></span>
+            <span class="est-summary-val" style="color:var(--amber)">${totalPend}</span>
+            <span class="est-summary-txt">Pendentes</span>
+          </div>
+          <div class="est-summary-item">
+            <span class="est-summary-dot" style="background:var(--green)"></span>
+            <span class="est-summary-val" style="color:var(--green)">${totalDisp}</span>
+            <span class="est-summary-txt">Em Estoque</span>
+          </div>
         </div>
       </div>`;
   }
