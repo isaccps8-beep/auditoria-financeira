@@ -184,14 +184,19 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 .est-legend2-num{font-size:24px;font-weight:900;font-family:var(--mono);line-height:1}
 .est-legend2-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;line-height:1.3}
 .est-card2-foot{display:flex;align-items:center;justify-content:space-between}
-.est-hero{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:20px}
-.est-hero-main{background:var(--surface2);border-radius:14px;padding:22px 20px;position:relative;min-height:120px;display:flex;flex-direction:column;justify-content:center}
-.est-hero-total{border-left:4px solid var(--text3)}
-.est-hero-num{font-size:38px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:8px}
-.est-hero-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);line-height:1.3}
-.est-hero-bar{height:5px;background:var(--border);border-radius:3px;margin-top:14px;overflow:hidden}
-.est-hero-bar>div{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-@media(max-width:640px){.est-hero{grid-template-columns:1fr 1fr;gap:12px}.est-legend2{grid-template-columns:1fr 1fr 1fr}}
+.est-summary{background:var(--surface2);border-radius:16px;padding:20px 24px;margin-bottom:18px;border:1px solid var(--border)}
+.est-summary-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+.est-summary-total{display:flex;align-items:baseline;gap:10px}
+.est-summary-total-num{font-size:34px;font-weight:900;font-family:var(--mono);color:var(--text);line-height:1}
+.est-summary-total-lbl{font-size:12px;font-weight:700;color:var(--text3)}
+.est-summary-bar{display:flex;height:14px;border-radius:8px;overflow:hidden;background:var(--surface);gap:3px;margin-bottom:16px}
+.est-summary-seg{transition:width .6s cubic-bezier(.4,0,.2,1);border-radius:4px;min-width:3px}
+.est-summary-legend{display:flex;gap:28px;flex-wrap:wrap}
+.est-summary-item{display:flex;align-items:center;gap:8px}
+.est-summary-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.est-summary-val{font-size:22px;font-weight:900;font-family:var(--mono);line-height:1}
+.est-summary-txt{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+@media(max-width:640px){.est-legend2{grid-template-columns:1fr 1fr 1fr}.est-summary-legend{gap:16px}}
 
 
 .est-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
