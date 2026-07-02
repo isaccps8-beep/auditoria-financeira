@@ -2034,44 +2034,49 @@ function renderEstoqueFiliais(tipo){
     const alerta=min>0&&disp<=min;
     const total=inst+pend+disp;
     const pct=totalGeral>0?Math.round(total/totalGeral*100):0;
+    const pInst=total>0?Math.round(inst/total*100):0;
+    const pPend=total>0?Math.round(pend/total*100):0;
+    const pDisp=total>0?Math.round(disp/total*100):0;
+    const cliInst=instCLI[f]||0;
+    const cliPend=pendCLI[f]||0;
     return `
-    <div class="est-filial-card${alerta?' alert-low':''}" data-filial="${f}" onclick="selecionarFilialEst('${tipo}','${f}')">
-      <div class="est-filial-hdr">
-        <div>
-          <div class="est-filial-name">${f}</div>
-          ${min>0?`<div style="font-size:10px;color:var(--text3);font-weight:700;margin-top:2px">Mínimo: ${min}</div>`:''}
+    <div class="est-card2${alerta?' alert-low':''}" data-filial="${f}" onclick="selecionarFilialEst('${tipo}','${f}')">
+      <div class="est-card2-top">
+        <div class="est-card2-title">
+          <span class="est-card2-flag">${f}</span>
+          ${alerta?'<span class="est-chip est-chip-red">⚠ Estoque baixo</span>':(disp>0?'<span class="est-chip est-chip-amber">'+disp+' disponível'+(disp>1?'is':'')+'</span>':'<span class="est-chip est-chip-green">✓ OK</span>')}
         </div>
-        <div style="display:flex;align-items:center;gap:6px">
-          ${alerta?'<span class="badge bg-red">⚠ Baixo</span>':'<span class="badge bg-green">✓ OK</span>'}
-          <span style="font-size:10px;color:var(--text3);font-weight:700">${pct}%</span>
-        </div>
-      </div>
-      <div class="est-stats" style="grid-template-columns:${pend>0?'1fr 1fr 1fr 1fr':'1fr 1fr 1fr'}">
-        <div class="est-stat-box">
-          <div class="est-stat-num" style="color:${cor}">${inst}</div>
-          <div class="est-stat-lbl">Torres</div>
-          ${tipo==='torre'&&instCLI[f]?`<div style="font-size:10px;color:var(--text3);font-weight:600;margin-top:2px">${instCLI[f]} cliente${instCLI[f]>1?'s':''}</div>`:''}
-        </div>
-        ${pend>0?`<div class="est-stat-box">
-          <div class="est-stat-num" style="color:var(--amber)">${pend}</div>
-          <div class="est-stat-lbl">Torres Pend.</div>
-          ${tipo==='torre'&&pendCLI[f]?`<div style="font-size:10px;color:var(--text3);font-weight:600;margin-top:2px">${pendCLI[f]} cliente${pendCLI[f]>1?'s':''}</div>`:''}
-        </div>`:''}
-        <div class="est-stat-box">
-          <div class="est-stat-num" style="color:${alerta?'var(--red)':disp>0?'var(--amber)':'var(--green)'}">${disp}</div>
-          <div class="est-stat-lbl">Disponíveis</div>
-        </div>
-        <div class="est-stat-box">
-          <div class="est-stat-num">${total}</div>
-          <div class="est-stat-lbl">Total</div>
+        <div class="est-card2-total">
+          <span class="est-card2-total-num">${total}</span>
+          <span class="est-card2-total-lbl">total</span>
         </div>
       </div>
-      <div class="est-progress" style="margin:0 16px 12px">
-        <div class="est-progress-fill" style="width:${total>0?Math.round(inst/total*100):0}%;background:${cor}"></div>
+      <div class="est-bar2" title="Instaladas ${inst} · Pendentes ${pend} · Disponíveis ${disp}">
+        ${inst>0?`<div class="est-bar2-seg" style="width:${pInst}%;background:${cor}"></div>`:''}
+        ${pend>0?`<div class="est-bar2-seg" style="width:${pPend}%;background:var(--amber)"></div>`:''}
+        ${disp>0?`<div class="est-bar2-seg" style="width:${pDisp}%;background:var(--green)"></div>`:''}
+        ${total===0?`<div class="est-bar2-seg" style="width:100%;background:var(--border)"></div>`:''}
       </div>
-      <div style="padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:11px;color:var(--text3);font-weight:700">Clique para movimentar</span>
-        <button class="btn btn-ghost" style="height:26px;padding:0 10px;font-size:11px" onclick="event.stopPropagation();selecionarFilialEst('${tipo}','${f}')">+ Adicionar</button>
+      <div class="est-legend2">
+        <div class="est-legend2-item">
+          <span class="est-legend2-dot" style="background:${cor}"></span>
+          <span class="est-legend2-num" style="color:${cor}">${inst}</span>
+          <span class="est-legend2-lbl">Instalad${tipo==='torre'?'as':'os'}${cliInst?` · ${cliInst} cli`:''}</span>
+        </div>
+        <div class="est-legend2-item">
+          <span class="est-legend2-dot" style="background:var(--amber)"></span>
+          <span class="est-legend2-num" style="color:var(--amber)">${pend}</span>
+          <span class="est-legend2-lbl">Pendentes${cliPend?` · ${cliPend} cli`:''}</span>
+        </div>
+        <div class="est-legend2-item">
+          <span class="est-legend2-dot" style="background:var(--green)"></span>
+          <span class="est-legend2-num" style="color:${alerta?'var(--red)':disp>0?'var(--green)':'var(--text3)'}">${disp}</span>
+          <span class="est-legend2-lbl">Em estoque</span>
+        </div>
+      </div>
+      <div class="est-card2-foot">
+        ${min>0?`<span style="font-size:10px;color:var(--text3);font-weight:700">Mín: ${min}</span>`:'<span></span>'}
+        <button class="btn btn-ghost" style="height:26px;padding:0 12px;font-size:11px" onclick="event.stopPropagation();selecionarFilialEst('${tipo}','${f}')">+ Movimentar</button>
       </div>
     </div>`;
   }).join('');
