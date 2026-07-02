@@ -7,8 +7,8 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Auditoria</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
 :root{--bg:#f0f2f8;--surface:#fff;--surface2:#f5f7fc;--surface3:#eaedfa;--border:#dde1f0;--border2:#c8cde8;--accent:#4338ca;--accent-h:#3730a3;--accent-l:#eef2ff;--accent-t:#312e81;--green:#16a34a;--green-l:#f0fdf4;--green-t:#14532d;--blue:#0369a1;--blue-l:#e0f2fe;--blue-t:#0c4a6e;--orange:#ea580c;--orange-l:#fff7ed;--orange-t:#7c2d12;--purple:#7c3aed;--purple-l:#f5f3ff;--purple-t:#4c1d95;--cyan:#0891b2;--cyan-l:#ecfeff;--cyan-t:#164e63;--teal:#0d9488;--teal-l:#f0fdfa;--teal-t:#134e4a;--red:#dc2626;--red-l:#fef2f2;--red-t:#7f1d1d;--amber:#d97706;--amber-l:#fffbeb;--amber-t:#78350f;--text:#0f172a;--text2:#1e293b;--text3:#64748b;--mono:'JetBrains Mono',monospace;--sans:'Inter',sans-serif;--shadow-xs:0 1px 3px rgba(67,56,202,.08);--shadow:0 4px 12px rgba(67,56,202,.10);--shadow-lg:0 12px 32px rgba(67,56,202,.14)}
@@ -2799,7 +2799,6 @@ function buildAlerts(){
 // EXPORT
 // ══════════════════════════════════════════
 const TAB_MAPS={
-  monuv:{h:['ID','Fantasia','Filial','Câmeras','Intel','TL','Tot.Cam','Tot.Intel','Tot.TL','Total','Cadastro','Status'],r:r=>[r.mid,r.fantasia,r.filial,r.qCam,r.qIntel,r.qTL,r.totCam,r.totIntel,r.totTL,r.total,fmtDate(r.datacad),r.status]},
   torre:{h:['Cliente','Filial','Custo Torre','Torres','Câmeras','Intel.','Tipo Intel.','Contrato','Val.Cliente','Tipo','Instalação','Status','Endereço','Obs.'],r:r=>[r.cliente,r.filial,r.custo,r.qtd,r.cameras,r.intels,r.tipoIntel,r.contrato,r.vcliente,r.tipo,fmtDate(r.data),r.status,r.endereco||'',r.obs||'']},
   terc:{h:['Cod','Empresa','Qtd','ValUnit','Total','Period'],r:r=>[r.cod,r.empresa,r.qtd,r.unit,r.total,r.period]},
   armario:{h:['Cond','Filial','Fornec','Portas','ValCliente','ValFornec','Total','Endereço','Obs','Status'],r:r=>[r.cond,r.filial,r.fornecedor,r.portas,r.vcliente,r.vforn,r.total,r.endereco||'',r.obs||'',r.status]},
@@ -2813,7 +2812,7 @@ function exportTabXLSX(type){const m=TAB_MAPS[type];if(!m||!DB[type].length)retu
 function exportTabJSON(type){if(!DB[type].length)return alert('Sem dados.');dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(DB[type],null,2)),`auditoria_${type}_${nowM()}.json`);}
 function exportAll(fmt_){
   if(fmt_==='json'){dl('data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({DB,EST,HIST},null,2)),`auditoria_completo_${nowM()}.json`);return;}
-  if(fmt_==='xlsx'){const wb=XLSX.utils.book_new();Object.keys(TAB_MAPS).forEach(t=>{if(!DB[t].length)return;const m=TAB_MAPS[t];const ws=XLSX.utils.aoa_to_sheet([m.h,...DB[t].map(r=>m.r(r))]);XLSX.utils.book_append_sheet(wb,ws,t);});XLSX.writeFile(wb,`auditoria_${nowM()}.xlsx`);return;}
+  if(fmt_==='xlsx'){if(typeof XLSX==='undefined'){alert('Aguarde, biblioteca carregando...');return;}const wb=XLSX.utils.book_new();Object.keys(TAB_MAPS).forEach(t=>{if(!DB[t].length)return;const m=TAB_MAPS[t];const ws=XLSX.utils.aoa_to_sheet([m.h,...DB[t].map(r=>m.r(r))]);XLSX.utils.book_append_sheet(wb,ws,t);});XLSX.writeFile(wb,`auditoria_${nowM()}.xlsx`);return;}
   alert('Formato não suportado diretamente. Use o menu por aba.');
 }
 function exportCSV(type){if(type==='all'){Object.keys(TAB_MAPS).forEach(t=>DB[t].length&&exportTabCSV(t));}else exportTabCSV(type);}
