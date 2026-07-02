@@ -1363,7 +1363,9 @@ function upsert(t,rec){
 
     function _regHist(tipoMov,qtde,motivo){
       const h={id:uid(),filial,tipo:tipoMov,quantidade:qtde,motivo,cliente:final.cliente,created_at:new Date().toISOString()};
-      HIST.torre.unshift(h);saveHistorico('torre',h);saveEstoque('torre',filial);save();
+      HIST.torre.unshift(h);save();
+      saveHistorico('torre',h).catch(()=>{});
+      saveEstoque('torre',filial).catch(()=>{});
     }
 
     if(!anterior){
@@ -1422,7 +1424,10 @@ function upsert(t,rec){
 
     function _regHistArm(tipoMov,motivo){
       const h={id:uid(),filial,tipo:tipoMov,quantidade:unidade,motivo,cliente:final.cond,created_at:new Date().toISOString()};
-      HIST.armario.unshift(h);saveHistorico('armario',h);saveEstoque('armario',filial);save();
+      HIST.armario.unshift(h);save();
+      // saveHistorico/saveEstoque requer RLS desabilitado no Supabase
+      saveHistorico('armario',h).catch(()=>{});
+      saveEstoque('armario',filial).catch(()=>{});
     }
 
     if(!anterior){
@@ -2783,7 +2788,6 @@ function buildComp(vm,vt,ve,va,vs,vsl,cP){
 
 function buildAlerts(){
   const al=[];
-  const iM=DB.monuv.filter(r=>r.status==='inativo'&&r.total>0);if(iM.length)al.push(`<div class="al al-red">⚠ Monuv: ${iM.length} inativo(s) com cobrança.</div>`);
   const iT=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0);if(iT.length)al.push(`<div class="al al-red">⚠ Torre: ${iT.length} inativa(s) com custo.</div>`);
   const wT=DB.terc.filter(r=>r.warn);if(wT.length)al.push(`<div class="al al-amber">⚠ Terceirizadas: ${wT.length} valor(es) atípico(s).</div>`);
   const iA=DB.armario.filter(r=>r.status==='inativo'&&r.total>0);if(iA.length)al.push(`<div class="al al-amber">⚠ Armários: ${iA.length} inativo(s) com cobrança.</div>`);
