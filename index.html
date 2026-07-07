@@ -1894,7 +1894,7 @@ function populateEstoqueModal(tipo){
 function selecionarFilialEst(tipo, filial){
   const pfx=tipo==='torre'?'et':'ea';
   // Marca card selecionado
-  document.querySelectorAll(`#${pfx}-filiais-grid .est-filial-card`).forEach(c=>{
+  document.querySelectorAll(`#${pfx}-filiais-grid .est-card2`).forEach(c=>{
     c.classList.toggle('selected', c.dataset.filial===filial);
   });
   // Preenche form
@@ -1913,7 +1913,7 @@ function selecionarFilialEst(tipo, filial){
 function fecharFormEst(tipo){
   const pfx=tipo==='torre'?'et':'ea';
   document.getElementById(`${pfx}-add-form`).classList.remove('open');
-  document.querySelectorAll(`#${pfx}-filiais-grid .est-filial-card`).forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll(`#${pfx}-filiais-grid .est-card2`).forEach(c=>c.classList.remove('selected'));
 }
 
 function setTipoEst(tipo, tipoMov){
@@ -2043,11 +2043,9 @@ function renderEstoqueFiliais(tipo){
     // - Para torre: max(EST.disponivel, inativas no DB)
     // - Para armario: inativas no DB + adições manuais (EST.disponivel)
     //   Se não há inativas e EST tem valor residual errado, usa só inativas
-    const disp = tipo==='torre'
-      ? Math.max(e.disponivel||0, inativoPF[f]||0)
-      : (inativoPF[f]||0) > 0
-        ? (inativoPF[f]||0) + Math.max(0,(e.disponivel||0))
-        : (e.disponivel||0);
+    // Disponível = torres INATIVAS (estoque físico real) + adições manuais
+    // Usa soma, não max(), para refletir mudanças de status corretamente
+    const disp = (inativoPF[f]||0) + Math.max(0,(e.disponivel||0));
     const min=e.minimo||0;
     const alerta=min>0&&disp<=min;
     const total=inst+pend+disp;
