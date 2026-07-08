@@ -2478,15 +2478,15 @@ function renderSegurosResumo(){
   const valTotal=sum(all.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial'),'valor');
   const STATUS=['Aberta','Em Análise','Documentação Pendente','Aprovada','Negada','Paga'];
   const byStatus=STATUS.map(s=>({s,n:all.filter(r=>r.status===s).length}));
-  const stat=(num,lbl,col)=>`<div style="flex:1;min-width:110px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:22px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div></div>`;
+  const stat=(num,lbl,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:22px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div></div>`;
   const chip=(s,n)=>`<span class="badge ${_segStatusBadge(s)}" style="font-size:11px">${s}: ${n}</span>`;
   el.innerHTML=`
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-      ${stat(total,'Total','var(--accent)')}
-      ${stat(recSim,'Recebidas','var(--green)')}
-      ${stat(recParc,'Parciais','var(--amber)')}
-      ${stat(recNao,'Não Recebidas','var(--red)')}
-      ${stat(fmt(valTotal),'Valor Indenizado','var(--green)')}
+      ${stat(total,'Total de Solicitações','var(--accent)')}
+      ${stat(recSim,'Indenizações Recebidas (Sim)','var(--green)')}
+      ${stat(recParc,'Indenizações Parciais','var(--amber)')}
+      ${stat(recNao,'Indenizações Não Recebidas','var(--red)')}
+      ${stat(fmt(valTotal),'Valor Total Indenizado','var(--green)')}
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
       <span style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase">Por status:</span>
