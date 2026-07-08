@@ -640,7 +640,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div class="fgroup"><label>Cliente *</label><input id="se-cliente" placeholder="Nome do cliente"></div>
     <div class="fgroup"><label>Conta</label><input id="se-conta" placeholder="Ex: 8178"></div>
     <div class="fgroup"><label>Filial *</label><select id="se-filial"><option value="">— Selecione —</option></select></div>
-    <div class="fgroup"><label>Serviço</label><select id="se-servico"><option value="">—</option><option>Alarme</option><option>Portaria</option><option>Monitoramento</option><option>Rastreamento</option></select></div>
+    <div class="fgroup"><label>Serviço</label><select id="se-servico"><option value="">—</option><option>Alarme</option><option>Portaria</option></select></div>
     <div class="fgroup"><label>Responsável</label><input id="se-resp" placeholder="Quem solicitou"></div>
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Sinistro</div><div class="fg-grid">
@@ -2476,22 +2476,94 @@ function renderSegurosResumo(){
   const recParc=all.filter(r=>r.indeniz==='Parcial').length;
   const recNao=all.filter(r=>r.indeniz==='Não').length;
   const valTotal=sum(all.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial'),'valor');
+  const SERVICOS=['Alarme','Portaria'];
   const STATUS=['Aberta','Em Análise','Documentação Pendente','Aprovada','Negada','Paga'];
-  const byStatus=STATUS.map(s=>({s,n:all.filter(r=>r.status===s).length}));
+  const IND=['Sim','Não','Parcial'];
+
   const stat=(num,lbl,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:22px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div></div>`;
-  const chip=(s,n)=>`<span class="badge ${_segStatusBadge(s)}" style="font-size:11px">${s}: ${n}</span>`;
-  el.innerHTML=`
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-      ${stat(total,'Total de Solicitações','var(--accent)')}
-      ${stat(recSim,'Indenizações Recebidas (Sim)','var(--green)')}
-      ${stat(recParc,'Indenizações Parciais','var(--amber)')}
-      ${stat(recNao,'Indenizações Não Recebidas','var(--red)')}
-      ${stat(fmt(valTotal),'Valor Total Indenizado','var(--green)')}
-    </div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase">Por status:</span>
-      ${byStatus.filter(x=>x.n>0).map(x=>chip(x.s,x.n)).join('')||'<span style="color:var(--text3);font-size:12px">Sem registros</span>'}
+
+  // Tabela genérica
+  const tbl=(title,cols,rows,accent)=>`
+    <div style="background:var(--surface);border:2px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-xs)">
+      <div style="padding:9px 14px;font-size:12px;font-weight:800;color:${accent||'var(--accent)'};border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:.3px">${title}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>${cols.map((c,i)=>`<th style="padding:7px 14px;text-align:${i===0?'left':'right'};font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)">${c}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r=>`<tr>${r.map((v,i)=>`<td style="padding:7px 14px;text-align:${i===0?'left':'right'};font-family:${i===0?'inherit':'var(--mono)'};font-weight:${r._bold?'800':'600'};${r._bold&&i===0?'color:'+(accent||'var(--accent)'):''}">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
     </div>`;
+
+  // Detalhamento por Serviço
+  const svcRows=SERVICOS.map(s=>{
+    const reg=all.filter(r=>r.servico===s);
+    const v=reg.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial').reduce((a,r)=>a+(Number(r.valor)||0),0);
+    return [s,reg.length,v>0?fmt(v):'—'];
+  });
+  const svcTotal=['Total',total,valTotal>0?fmt(valTotal):'—'];svcTotal._bold=true;
+  svcRows.push(svcTotal);
+
+  // Solicitações por Status
+  const stRows=STATUS.map(s=>[s,all.filter(r=>r.status===s).length]);
+  // Indenização Recebida
+  const indCounts={'Sim':recSim,'Não':recNao,'Parcial':recParc};
+  const indRows=IND.map(i=>[i,indCounts[i]]);
+
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px;margin-bottom:0">
+      <div style="font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">📋 Resumo de Solicitações de Seguro</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        ${stat(total,'Total de Solicitações','var(--accent)')}
+        ${stat(recSim,'Indenizações Recebidas (Sim)','var(--green)')}
+        ${stat(recParc,'Indenizações Parciais','var(--amber)')}
+        ${stat(recNao,'Indenizações Não Recebidas','var(--red)')}
+        ${stat(valTotal>0?fmt(valTotal):'—','Valor Total Indenizado','var(--green)')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+        ${tbl('Detalhamento por Serviço',['Serviço','Qtde','Valor Indenizado'],svcRows,'var(--blue)')}
+        ${tbl('Solicitações por Status',['Status','Qtde'],stRows,'var(--purple-t)')}
+        ${tbl('Indenização Recebida',['Status','Qtde'],indRows,'var(--green)')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
+        ${_segChartBox('Valor Indenizado por Serviço','seg-ch-valserv')}
+        ${_segChartBox('Qtde de Solicitações por Serviço','seg-ch-qtdserv')}
+        ${_segChartBox('Solicitações por Status','seg-ch-status')}
+        ${_segChartBox('Indenização Recebida','seg-ch-indeniz')}
+      </div>
+    </div>`;
+  // desenha gráficos após o DOM ser atualizado
+  setTimeout(()=>_segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}),30);
+}
+
+function _segChartBox(title,id){
+  return `<div style="background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow-xs)">
+    <div style="font-size:12px;font-weight:800;color:var(--text2);margin-bottom:8px;text-align:center">${title}</div>
+    <div style="position:relative;height:180px"><canvas id="${id}"></canvas></div>
+  </div>`;
+}
+
+function _segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}){
+  if(typeof Chart==='undefined')return;
+  const C=COLS.seguros, grid=isDark()?'#1e293b':'#e5e7eb', txt=isDark()?'#94a3b8':'#64748b';
+  const baseOpts=extra=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:txt,font:{size:10}}},y:{beginAtZero:true,grid:{color:grid},ticks:{color:txt,font:{size:10},precision:0}}},...extra});
+  const mk=(id,cfg)=>{const el=document.getElementById(id);if(!el)return;if(_CH[id]){try{_CH[id].destroy();}catch(e){}}_CH[id]=new Chart(el.getContext('2d'),cfg);};
+
+  // 1) Valor Indenizado por Serviço (barras)
+  const valServ=SERVICOS.map(s=>all.filter(r=>r.servico===s&&(r.indeniz==='Sim'||r.indeniz==='Parcial')).reduce((a,r)=>a+(Number(r.valor)||0),0));
+  mk('seg-ch-valserv',{type:'bar',data:{labels:SERVICOS,datasets:[{data:valServ,backgroundColor:C+'cc',borderColor:C,borderWidth:1,borderRadius:4}]},options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)}}}})});
+
+  // 2) Qtde de Solicitações por Serviço (barras)
+  const qtdServ=SERVICOS.map(s=>all.filter(r=>r.servico===s).length);
+  mk('seg-ch-qtdserv',{type:'bar',data:{labels:SERVICOS,datasets:[{data:qtdServ,backgroundColor:'#0369a1cc',borderColor:'#0369a1',borderWidth:1,borderRadius:4}]},options:baseOpts()});
+
+  // 3) Solicitações por Status (barras)
+  const stData=STATUS.map(s=>all.filter(r=>r.status===s).length);
+  const stCols={'Aberta':'#7c3aed','Em Análise':'#0369a1','Documentação Pendente':'#d97706','Aprovada':'#0891b2','Negada':'#dc2626','Paga':'#16a34a'};
+  mk('seg-ch-status',{type:'bar',data:{labels:STATUS.map(s=>s.length>12?s.slice(0,11)+'…':s),datasets:[{data:stData,backgroundColor:STATUS.map(s=>stCols[s]+'cc'),borderColor:STATUS.map(s=>stCols[s]),borderWidth:1,borderRadius:4}]},options:baseOpts()});
+
+  // 4) Indenização Recebida (pizza)
+  const indData=[recSim,recNao,recParc];
+  const indCols=['#16a34a','#dc2626','#d97706'];
+  const hasInd=indData.some(v=>v>0);
+  mk('seg-ch-indeniz',{type:'doughnut',data:{labels:IND,datasets:[{data:hasInd?indData:[1,1,1],backgroundColor:indCols.map(c=>c+'dd'),borderColor:isDark()?'#0f1629':'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:txt,font:{size:11},boxWidth:12,padding:8}},tooltip:{enabled:hasInd}}}});
 }
 
 function verSeguros(id){
