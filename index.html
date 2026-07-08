@@ -321,7 +321,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div><div class="pg-title">Visão Geral</div><div class="pg-sub">Consolidado financeiro em tempo real</div></div>
     <div class="flex">
       <div class="fg"><label>Período</label><input type="month" id="dash-month" onchange="renderDash()"></div>
-      <div class="fg"><label>Módulo</label><select id="dash-svc" onchange="renderDash()"><option value="all">Todos</option><option value="torre">Torre</option><option value="terc">Terceirizadas</option><option value="armario">Armários</option><option value="segware">Segware</option><option value="selbit">Selbit</option></select></div>
+      <div class="fg"><label>Módulo</label><select id="dash-svc" onchange="renderDash()"><option value="all">Todos</option><option value="torre">Torre</option><option value="terc">Terceirizadas</option><option value="armario">Armários</option><option value="segware">Segware</option><option value="selbit">Selbit</option><option value="seguros">Seguros</option></select></div>
       <div class="fg"><label>Comparativo</label><select id="dash-cmp" onchange="renderDash()"><option value="prev">Mês anterior</option><option value="year">Mesmo mês / ano ant.</option><option value="none">Sem comparativo</option></select></div>
       <button class="btn btn-ghost" onclick="forceSyncAndRender()" title="Forçar sincronização">🔄 Sincronizar</button>
     </div>
@@ -661,7 +661,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 <div class="overlay" id="modal-ver-seguros"><div class="modal"><div class="modal-hdr"><div style="flex:1"><div class="modal-title" id="ver-seguros-title" style="font-size:16px">—</div><div class="modal-sub" id="ver-seguros-sub">—</div></div><button class="hbtn-icon" onclick="closeModal('ver-seguros')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body" id="ver-seguros-body" style="padding:0;gap:0"></div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('ver-seguros')">Fechar</button><button class="btn btn-primary" id="ver-seguros-edit-btn">✏️ Editar</button></div></div></div>
 
 <!-- IMPORT -->
-<div class="overlay" id="modal-import"><div class="modal"><div class="modal-hdr"><div><div class="modal-title">Importar Planilha</div><div class="modal-sub">CSV e Excel</div></div><button class="hbtn-icon" onclick="closeModal('import')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body"><div id="imp-s1"><div id="imp-drop" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleDrop(event)" style="border:3px dashed var(--border2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;background:var(--surface2)"><div style="font-size:32px;margin-bottom:10px;opacity:.5">📊</div><div style="font-weight:800;font-size:14px">Arraste ou clique para selecionar</div><div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px">.csv · .xlsx · .xls</div></div><input type="file" id="imp-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(event)"></div><div id="imp-s2" style="display:none"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px"><div class="fgroup"><label>Módulo *</label><select id="imp-dest" onchange="buildMapping()"><option value="">— Selecione —</option><option value="torre">Torre</option><option value="terc">Terceirizadas</option><option value="armario">Armários</option><option value="segware">Segware</option><option value="selbit">Selbit</option></select></div><div class="fgroup"><label>Linha cabeçalho</label><input type="number" id="imp-hrow" value="1" min="1" max="20" onchange="reparseFile()"></div></div><div id="imp-map-wrap" style="display:none"><div class="sec-lbl" style="color:var(--accent)">Mapeamento</div><div id="imp-map-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px"></div></div></div><div id="imp-s3" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div class="sec-lbl" style="color:var(--green);margin-bottom:0;flex:1">Pré-visualização</div><span id="imp-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);font-weight:700"></span></div><div style="overflow:auto;max-height:200px;border-radius:10px;border:2px solid var(--border)"><table id="imp-prev-tbl" style="width:100%;border-collapse:collapse;font-size:12px"><thead id="imp-prev-hdr"></thead><tbody id="imp-prev-body"></tbody></table></div><div id="imp-warns" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div></div></div><div class="modal-ftr"><span id="imp-status" style="font-size:11px;color:var(--text3);margin-right:auto;font-weight:700"></span><button class="btn btn-ghost" onclick="closeModal('import')">Cancelar</button><button class="btn btn-primary" id="imp-confirm" onclick="confirmImport()" style="display:none">✓ Confirmar</button></div></div></div>
+<div class="overlay" id="modal-import"><div class="modal"><div class="modal-hdr"><div><div class="modal-title">Importar Planilha</div><div class="modal-sub">CSV e Excel</div></div><button class="hbtn-icon" onclick="closeModal('import')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body"><div id="imp-s1"><div id="imp-drop" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleDrop(event)" style="border:3px dashed var(--border2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;background:var(--surface2)"><div style="font-size:32px;margin-bottom:10px;opacity:.5">📊</div><div style="font-weight:800;font-size:14px">Arraste ou clique para selecionar</div><div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px">.csv · .xlsx · .xls</div></div><input type="file" id="imp-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(event)"></div><div id="imp-s2" style="display:none"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px"><div class="fgroup"><label>Módulo *</label><select id="imp-dest" onchange="buildMapping()"><option value="">— Selecione —</option><option value="torre">Torre</option><option value="terc">Terceirizadas</option><option value="armario">Armários</option><option value="segware">Segware</option><option value="selbit">Selbit</option><option value="seguros">Seguros</option></select></div><div class="fgroup"><label>Linha cabeçalho</label><input type="number" id="imp-hrow" value="1" min="1" max="20" onchange="reparseFile()"></div></div><div id="imp-map-wrap" style="display:none"><div class="sec-lbl" style="color:var(--accent)">Mapeamento</div><div id="imp-map-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px"></div></div></div><div id="imp-s3" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div class="sec-lbl" style="color:var(--green);margin-bottom:0;flex:1">Pré-visualização</div><span id="imp-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);font-weight:700"></span></div><div style="overflow:auto;max-height:200px;border-radius:10px;border:2px solid var(--border)"><table id="imp-prev-tbl" style="width:100%;border-collapse:collapse;font-size:12px"><thead id="imp-prev-hdr"></thead><tbody id="imp-prev-body"></tbody></table></div><div id="imp-warns" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div></div></div><div class="modal-ftr"><span id="imp-status" style="font-size:11px;color:var(--text3);margin-right:auto;font-weight:700"></span><button class="btn btn-ghost" onclick="closeModal('import')">Cancelar</button><button class="btn btn-primary" id="imp-confirm" onclick="confirmImport()" style="display:none">✓ Confirmar</button></div></div></div>
 
 <!-- ESTOQUE TORRES -->
 <div class="overlay" id="modal-estoque-torre">
@@ -1276,6 +1276,7 @@ const totTerc=p=>sum(p?DB.terc.filter(r=>r.period===p):DB.terc,'total');
 const totArmario=()=>DB.armario.filter(r=>r.status==='ativo').reduce((a,b)=>a+_vArmario(b),0);
 const totSegware=p=>sum(p?DB.segware.filter(r=>r.period===p):DB.segware,'total');
 const totSelbit=p=>sum(p?DB.selbit.filter(r=>r.period===p):DB.selbit,'total');
+const totSeguros=()=>DB.seguros.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial').reduce((a,b)=>a+(Number(b.valor)||0),0);
 
 // ══════════════════════════════════════════
 // THEME
@@ -2561,7 +2562,7 @@ const dc=id=>{if(_CH[id]){try{_CH[id].destroy();}catch(e){}delete _CH[id];}};
 const isDark=()=>document.documentElement.getAttribute('data-theme')==='dark';
 const gc=()=>isDark()?'rgba(255,255,255,.06)':'rgba(67,56,202,.06)';
 const tc=()=>isDark()?'#64748b':'#94a3b8';
-const COLS={monuv:'#16a34a',torre:'#0369a1',terc:'#ea580c',armario:'#7c3aed',segware:'#0891b2',selbit:'#0d9488'};
+const COLS={monuv:'#16a34a',torre:'#0369a1',terc:'#ea580c',armario:'#7c3aed',segware:'#0891b2',selbit:'#0d9488',seguros:'#dc2626'};
 
 function bOpts(lg){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:lg,labels:{color:isDark()?'#94a3b8':'#475569',font:{family:'Inter',size:11,weight:'700'},boxWidth:10,padding:12}},tooltip:{callbacks:{label:c=>' '+fmt(c.raw)},bodyFont:{family:'JetBrains Mono',weight:'700'},titleFont:{family:'Inter',weight:'800'}}},scales:{x:{grid:{color:gc()},ticks:{color:tc(),font:{family:'JetBrains Mono',size:10,weight:'700'}}},y:{grid:{color:gc()},ticks:{color:tc(),font:{family:'JetBrains Mono',size:10,weight:'700'},callback:v=>'R$'+v.toLocaleString('pt-BR')}}}};}
 
@@ -2616,6 +2617,7 @@ function _renderDashNow(){
   const va=svc==='all'||svc==='armario'?totArmario():0;
   const vs=svc==='all'||svc==='segware'?totSegware(period):0;
   const vsl=svc==='all'||svc==='selbit'?totSelbit(period):0;
+  const vseg=svc==='all'||svc==='seguros'?totSeguros():0;
   const tot=vm+vt+ve+va+vs+vsl;
 
   const pvm=null;
@@ -2637,7 +2639,8 @@ function _renderDashNow(){
     {l:'Terceirizadas',v:ve,p:pve,c:'c3',i:'🏢',svc:'terc'},
     {l:'Armários',v:va,p:pva,c:'c4',i:'🔒',svc:'armario'},
     {l:'Segware',v:vs,p:pvs,c:'c5',i:'🛡️',svc:'segware'},
-    {l:'Selbit',v:vsl,p:pvsl,c:'c6',i:'💻',svc:'selbit'}
+    {l:'Selbit',v:vsl,p:pvsl,c:'c6',i:'💻',svc:'selbit'},
+    {l:'Seguros · Indenizado',v:vseg,p:null,c:'c3',i:'📋',svc:'seguros'}
   ];
   document.getElementById('kpi-grid').innerHTML=_kpiDefs.map((k,idx)=>{
     const d=k.p!==null&&k.p!==undefined?pct(k.v,k.p):null;
@@ -2653,7 +2656,7 @@ function _renderDashNow(){
   }).join('');
 
   // Títulos dinâmicos dos 3 gráficos
-  const MODULO_NAMES={all:'Todos',monuv:'Monuv',torre:'Torre',terc:'Terceirizadas',armario:'Armários',segware:'Segware',selbit:'Selbit'};
+  const MODULO_NAMES={all:'Todos',monuv:'Monuv',torre:'Torre',terc:'Terceirizadas',armario:'Armários',segware:'Segware',selbit:'Selbit',seguros:'Seguros'};
   const nome=MODULO_NAMES[svc]||svc;
 
   if(svc==='all'){
@@ -2696,6 +2699,11 @@ function buildLine(period,svc){
       segware: {label:'Segware',        data:pr.map(p=>totSegware(p)), col:COLS.segware},
       selbit:  {label:'Selbit',         data:pr.map(p=>totSelbit(p)),  col:COLS.selbit},
     };
+    if(svc==='seguros'){
+      // Evolução mensal de indenizações (Sim + Parcial) pela data da solicitação
+      const data=pr.map(p=>DB.seguros.filter(r=>(r.indeniz==='Sim'||r.indeniz==='Parcial')&&String(r.data||'').slice(0,7)===p).reduce((a,r)=>a+(Number(r.valor)||0),0));
+      ds.push({label:'Seguros · Indenizado',data,borderColor:COLS.seguros,backgroundColor:COLS.seguros+'30',tension:.4,pointRadius:4,pointHoverRadius:8,borderWidth:3,fill:true,pointBackgroundColor:COLS.seguros});
+    }
     const c=cfg[svc];
     if(c) ds.push({label:c.label,data:c.data,borderColor:c.col,backgroundColor:c.col+'30',tension:.4,pointRadius:4,pointHoverRadius:8,borderWidth:3,fill:true,pointBackgroundColor:c.col});
   }
@@ -2728,11 +2736,12 @@ function buildDoughnut(vm,vt,ve,va,vs,vsl){
   const activeIdx=svcs.indexOf(curSvc);
 
   // Quando filtrado: fatia selecionada em destaque, resto transparente
-  const bgs=Object.values(COLS).map((c,i)=>{
+  const _sliceCols=svcs.map(s=>COLS[s]);
+  const bgs=_sliceCols.map((c,i)=>{
     if(curSvc==='all') return c+'ee';
     return i===activeIdx?c+'ff':c+'22';
   });
-  const borders=Object.values(COLS).map((c,i)=>{
+  const borders=_sliceCols.map((c,i)=>{
     if(curSvc==='all') return isDark()?'#0f1629':'#fff';
     return i===activeIdx?c:c+'44';
   });
@@ -3176,14 +3185,39 @@ function confirmImport(){
   renderDash();
   renderMonuv();renderTorre();renderTerc();renderTercPivot();renderArmario();renderSegware();renderSelbit();renderSeguros();
 }
+// Converte data vinda do Excel (serial number ou string) para YYYY-MM-DD
+function _impDate(v){
+  if(v===undefined||v===null||v==='')return'';
+  // Número serial do Excel (dias desde 1899-12-30)
+  if(typeof v==='number'||/^\d+(\.\d+)?$/.test(String(v).trim())){
+    const n=Number(v);
+    if(n>20000&&n<80000){const d=new Date(Math.round((n-25569)*86400*1000));return d.toISOString().slice(0,10);}
+  }
+  const s=String(v).trim();
+  // dd/mm/yyyy → yyyy-mm-dd
+  const br=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(br)return`${br[3]}-${br[2].padStart(2,'0')}-${br[1].padStart(2,'0')}`;
+  // já ISO
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return iso[0];
+  return s;
+}
+// Converte "R$ 1.482,00" ou "1482.00" para número
+function _impMoney(v){
+  if(v===undefined||v===null||v==='')return 0;
+  if(typeof v==='number')return v;
+  let s=String(v).replace(/[R$\s]/g,'');
+  if(s.includes(',')){s=s.replace(/\./g,'').replace(',','.');}
+  return Number(s)||0;
+}
 function buildRow(dest,mapped,headers){
-  const r={id:uid()};
   if(dest==='monuv')return{id:uid(),mid:mapped['ID']||uid(),fantasia:mapped['Fantasia']||'',filial:mapped['Filial']||'',status:mapped['Status']||'ativo',qCam:Number(mapped['Câmeras'])||0,qIntel:Number(mapped['Intel'])||0,qTL:Number(mapped['TL'])||0,vCam:0,vIntel:0,vTL:0,totCam:Number(mapped['Tot.Cam'])||0,totIntel:Number(mapped['Tot.Intel'])||0,totTL:Number(mapped['Tot.TL'])||0,total:Number(mapped['Total'])||0,datacad:mapped['Cadastro']||today()};
   if(dest==='torre')return{id:uid(),cliente:mapped['Cliente']||'',filial:mapped['Filial']||'',status:mapped['Status']||'ativo',tipo:mapped['Tipo']||'',contrato:mapped['Contrato']||'Não',data:mapped['Instalação']||'',qtd:Number(mapped['Torres'])||0,cameras:Number(mapped['Câmeras'])||0,intels:Number(mapped['Intel.'])||0,tipoIntel:mapped['Tipo Intel.']||'',custo:Number(mapped['Custo Torre'])||0,vcliente:Number(mapped['Val.Cliente'])||0,endereco:mapped['Endereço']||'',obs:mapped['Obs.']||''};
   if(dest==='terc')return{id:uid(),cod:mapped['Cod']||uid(),empresa:mapped['Empresa']||'',qtd:Number(mapped['Qtd'])||0,unit:Number(mapped['ValUnit'])||0,total:Number(mapped['Total'])||0,period:mapped['Period']||nowM()};
   if(dest==='segware')return{id:uid(),produto:mapped['Produto']||'',qtd:Number(mapped['Qtd'])||0,unit:Number(mapped['ValUnit'])||0,total:Number(mapped['Total'])||0,period:mapped['Period']||nowM()};
   if(dest==='selbit')return{id:uid(),sid:mapped['ID']||uid(),desc:mapped['Desc']||'',local:mapped['Local']||'',valor:Number(mapped['Valor'])||0,impPB:Number(mapped['ImpPB'])||0,impColor:Number(mapped['ImpColor'])||0,vlPB:Number(mapped['VlPB'])||0,vlColor:Number(mapped['VlColor'])||0,totPB:Number(mapped['TotPB'])||0,totColor:Number(mapped['TotColor'])||0,total:Number(mapped['Total'])||0,period:mapped['Period']||nowM()};
   if(dest==='armario')return{id:uid(),cond:mapped['Cond']||'',filial:mapped['Filial']||'',fornecedor:mapped['Fornec']||'',portas:Number(mapped['Portas'])||0,vcliente:Number(mapped['ValCliente'])||0,vforn:Number(mapped['ValFornec'])||0,total:Number(mapped['Total'])||0,status:mapped['Status']||'ativo',endereco:mapped['Endereço']||''};
+  if(dest==='seguros')return{id:uid(),data:_impDate(mapped['Data']),cliente:mapped['Cliente']||'',conta:String(mapped['Conta']||'').replace(/\.0$/,''),filial:_normFilial(mapped['Filial']||''),servico:mapped['Serviço']||'',sinistro:mapped['Sinistro']||'',descricao:mapped['Descrição']||'',resp:mapped['Responsável']||'',status:mapped['Status']||'Aberta',data_resp:_impDate(mapped['Data Resposta']),indeniz:mapped['Indenização']||'',valor:_impMoney(mapped['Valor']),data_pag:_impDate(mapped['Data Pagamento']),obs:mapped['Obs']||''};
   return null;
 }
 
@@ -3217,7 +3251,7 @@ async function forceSyncAndRender(){
   if(activeTab){
     const id=activeTab.getAttribute('onclick').match(/'([^']+)'/)?.[1];
     if(id&&id!=='dash'){
-      ({torre:renderTorre,terc:()=>{renderTerc();renderTercPivot();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit})[id]?.();
+      ({torre:renderTorre,terc:()=>{renderTerc();renderTercPivot();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit,seguros:renderSeguros})[id]?.();
     }
   }
 }
