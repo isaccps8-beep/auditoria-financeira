@@ -327,6 +327,10 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     </div>
   </div>
   <div class="kpi-row" id="kpi-grid"></div>
+  <!-- PAINEL SEGUROS (só quando módulo=seguros) -->
+  <div id="dash-seguros-panel" style="display:none"></div>
+  <!-- CONTEÚDO NORMAL (faturamento) -->
+  <div id="dash-normal">
   <!-- CHARTS: 3 gráficos fixos — respondem ao KPI selecionado -->
   <div class="charts-3" style="margin-bottom:16px">
     <div class="card">
@@ -360,6 +364,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div><div class="pg-hdr" style="margin-bottom:12px"><div><div class="pg-title" style="font-size:14px">Comparativo por Módulo</div><div id="cmp-label" class="pg-sub"></div></div></div><div class="comp-grid" id="comp-grid"></div></div>
     <div><div class="pg-hdr" style="margin-bottom:12px"><div><div class="pg-title" style="font-size:14px">Inconsistências</div></div></div><div id="dash-alerts" class="alerts"></div></div>
   </div>
+  </div><!-- /dash-normal -->
 </div>
 
 <div id="tab-torre" class="tab">
@@ -438,7 +443,6 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div class="fg"><label>Indenização</label><select id="f-seguros-ind" onchange="renderSeguros()"><option value="">Todas</option><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
     <div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('seguros')">↓ Exportar ▾</button><div class="export-menu" id="em-seguros"><div class="export-item" onclick="exportSegurosXLSX()">📊 Excel (2 abas)</div><div class="export-item" onclick="exportTabCSV('seguros')">📋 CSV</div><div class="export-item" onclick="exportTabJSON('seguros')">🗂 JSON</div></div></div>
   </div>
-  <div id="seguros-resumo" style="margin-bottom:14px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Data</th><th>Cliente</th><th>Conta</th><th>Filial</th><th>Serviço</th><th>Sinistro</th><th>Status</th><th>Indeniz.</th><th>Valor (R$)</th><th>Ações</th></tr></thead><tbody id="tb-seguros"></tbody></table><div class="tbl-foot" id="tf-seguros"></div></div>
 </div>
 
@@ -2465,11 +2469,10 @@ function renderSeguros(){
     </div></td></tr>`).join(''):emptyR(11);
   const totVal=sum(rows,'valor');
   document.getElementById('tf-seguros').innerHTML=`<div class="tf-item"><span>Solicitações</span><strong style="color:var(--blue)">${rows.length}</strong></div><div class="tf-item"><span>💰 Total Indenizado</span><strong style="color:var(--green)">${fmt(totVal)}</strong></div>`;
-  renderSegurosResumo();
 }
 
 function renderSegurosResumo(){
-  const el=document.getElementById('seguros-resumo');if(!el)return;
+  const el=document.getElementById('dash-seguros-panel');if(!el)return;
   const all=DB.seguros;
   const total=all.length;
   const recSim=all.filter(r=>r.indeniz==='Sim').length;
@@ -2739,6 +2742,23 @@ function _renderDashNow(){
     _setChartTitle('ch-line',    nome+' · Evolução', 'Últimos 12 meses — clique para mudar período');
     _setChartTitle('ch-doughnut',nome+' · Participação','vs demais módulos — clique para filtrar');
     _setChartTitle('ch-ranking', nome+' · Ranking',  'Top valores — clique para detalhes');
+  }
+
+  // Alterna painel de Seguros (só quando módulo=seguros)
+  const _segPanel=document.getElementById('dash-seguros-panel');
+  const _normal=document.getElementById('dash-normal');
+  const _kpiRow=document.getElementById('kpi-grid');
+  if(svc==='seguros'){
+    if(_normal)_normal.style.display='none';
+    if(_kpiRow)_kpiRow.style.display='none';
+    if(_segPanel)_segPanel.style.display='block';
+    renderSegurosResumo();
+    document.getElementById('cmp-label').textContent='';
+    return;
+  } else {
+    if(_normal)_normal.style.display='';
+    if(_kpiRow)_kpiRow.style.display='';
+    if(_segPanel)_segPanel.style.display='none';
   }
 
   buildLine(period,svc);
