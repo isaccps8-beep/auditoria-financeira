@@ -310,6 +310,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <button class="ntab" onclick="goTab('armario',this)">Armários <span class="nbadge" id="nb-armario">0</span></button>
   <button class="ntab" onclick="goTab('segware',this)">Segware <span class="nbadge" id="nb-segware">0</span></button>
   <button class="ntab" onclick="goTab('selbit',this)">Selbetti <span class="nbadge" id="nb-selbit">0</span></button>
+  <button class="ntab" onclick="goTab('seguros',this)">Seguros <span class="nbadge" id="nb-seguros">0</span></button>
 </nav>
 
 <div class="body">
@@ -425,6 +426,20 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-selbit" placeholder="ID ou descrição…" oninput="renderSelbit()" style="min-width:160px"></div><div class="fg"><label>Período</label><input type="month" id="f-selbit-per" onchange="renderSelbit()"></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('selbit')">↓ Exportar ▾</button><div class="export-menu" id="em-selbit"><div class="export-item" onclick="exportTabCSV('selbit')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('selbit')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('selbit')">🗂 JSON</div></div></div></div>
   <div id="alerts-selbit" class="alerts" style="margin-bottom:12px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Descrição</th><th>Local</th><th>Valor</th><th>Imp.PB</th><th>Imp.Color</th><th>Vl.PB</th><th>Vl.Color</th><th>Tot.PB</th><th>Tot.Color</th><th>Total</th><th>Período</th><th>Ações</th></tr></thead><tbody id="tb-selbit"></tbody></table><div class="tbl-foot" id="tf-selbit"></div></div>
+</div>
+
+<!-- SEGUROS -->
+<div id="tab-seguros" class="tab">
+  <div class="pg-hdr"><div><div class="pg-title">Seguros · Solicitações</div><div class="pg-sub">Sinistros e indenizações</div></div><button class="btn btn-primary" onclick="openModal('seguros')">+ Nova Solicitação</button></div>
+  <div class="filters">
+    <div class="fg"><label>Pesquisar</label><input type="text" id="f-seguros" placeholder="Cliente…" oninput="renderSeguros()" style="min-width:160px"></div>
+    <div class="fg"><label>Filial</label><select id="f-seguros-fil" onchange="renderSeguros()"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Status</label><select id="f-seguros-st" onchange="renderSeguros()"><option value="">Todos</option><option>Aberta</option><option>Em Análise</option><option>Documentação Pendente</option><option>Aprovada</option><option>Negada</option><option>Paga</option></select></div>
+    <div class="fg"><label>Indenização</label><select id="f-seguros-ind" onchange="renderSeguros()"><option value="">Todas</option><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+    <div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('seguros')">↓ Exportar ▾</button><div class="export-menu" id="em-seguros"><div class="export-item" onclick="exportSegurosXLSX()">📊 Excel (2 abas)</div><div class="export-item" onclick="exportTabCSV('seguros')">📋 CSV</div><div class="export-item" onclick="exportTabJSON('seguros')">🗂 JSON</div></div></div>
+  </div>
+  <div id="seguros-resumo" style="margin-bottom:14px"></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Nº</th><th>Data</th><th>Cliente</th><th>Conta</th><th>Filial</th><th>Serviço</th><th>Sinistro</th><th>Status</th><th>Indeniz.</th><th>Valor (R$)</th><th>Ações</th></tr></thead><tbody id="tb-seguros"></tbody></table><div class="tbl-foot" id="tf-seguros"></div></div>
 </div>
 
 </div></div>
@@ -617,6 +632,33 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid"><div class="fgroup"><label>Valor Fixo (R$)</label><input type="number" id="sl-valor" min="0" step=".01" placeholder="0,00" oninput="calcSL()"></div><div class="fgroup"><label>Vl.Unit. P&B</label><input type="number" id="sl-vl-pb" min="0" step=".0001" placeholder="0,0000" oninput="calcSL()"></div><div class="fgroup"><label>Vl.Unit. Color</label><input type="number" id="sl-vl-color" min="0" step=".0001" placeholder="0,0000" oninput="calcSL()"></div></div></div>
   <div class="calc-panel"><div class="sec-lbl" style="color:var(--green)">Totais</div><div class="fg-grid"><div class="fgroup"><label>Total P&B</label><input id="sl-tot-pb" readonly style="color:var(--blue);font-weight:800"></div><div class="fgroup"><label>Total Color</label><input id="sl-tot-color" readonly style="color:var(--orange);font-weight:800"></div><div class="fgroup"><label>Total Geral</label><input id="sl-total" readonly style="color:var(--accent);font-weight:800"></div></div></div>
 </div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('selbit')">Cancelar</button><button class="btn btn-primary" onclick="saveRecord('selbit')">💾 Salvar</button></div></div></div>
+
+<!-- MODAL SEGUROS (cadastro) -->
+<div class="overlay" id="modal-seguros"><div class="modal"><div class="modal-hdr"><div><div class="modal-title" id="modal-seguros-title">Nova — Seguro</div><div class="modal-sub">* obrigatórios</div></div><button class="hbtn-icon" onclick="closeModal('seguros')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body">
+  <div class="sec"><div class="sec-lbl" style="color:var(--accent)">Solicitação</div><div class="fg-grid">
+    <div class="fgroup"><label>Data da Solicitação *</label><input type="date" id="se-data"></div>
+    <div class="fgroup"><label>Cliente *</label><input id="se-cliente" placeholder="Nome do cliente"></div>
+    <div class="fgroup"><label>Conta</label><input id="se-conta" placeholder="Ex: 8178"></div>
+    <div class="fgroup"><label>Filial *</label><select id="se-filial"><option value="">— Selecione —</option></select></div>
+    <div class="fgroup"><label>Serviço</label><select id="se-servico"><option value="">—</option><option>Alarme</option><option>Portaria</option><option>Monitoramento</option><option>Rastreamento</option></select></div>
+    <div class="fgroup"><label>Responsável</label><input id="se-resp" placeholder="Quem solicitou"></div>
+  </div></div>
+  <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Sinistro</div><div class="fg-grid">
+    <div class="fgroup"><label>Tipo de Sinistro</label><select id="se-sinistro"><option value="">—</option><option>Roubo/Furto</option><option>Vandalismo</option><option>Incêndio</option><option>Dano Elétrico</option><option>Alagamento</option><option>Outro</option></select></div>
+    <div class="fgroup" style="grid-column:1/-1"><label>Descrição da Ocorrência</label><textarea id="se-desc" rows="2" placeholder="Descreva o ocorrido…" style="resize:vertical"></textarea></div>
+  </div></div>
+  <div class="sec"><div class="sec-lbl" style="color:var(--green)">Seguradora / Indenização</div><div class="fg-grid">
+    <div class="fgroup"><label>Status *</label><select id="se-status" onchange="updateStatusColorSeg()"><option>Aberta</option><option>Em Análise</option><option>Documentação Pendente</option><option>Aprovada</option><option>Negada</option><option>Paga</option></select></div>
+    <div class="fgroup"><label>Data Resposta Seguradora</label><input type="date" id="se-dataresp"></div>
+    <div class="fgroup"><label>Indenização Recebida?</label><select id="se-indeniz"><option value="">—</option><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+    <div class="fgroup"><label>Valor Indenizado (R$)</label><input type="number" id="se-valor" min="0" step=".01" placeholder="0,00"></div>
+    <div class="fgroup"><label>Data Pagamento ao Cliente</label><input type="date" id="se-datapag"></div>
+  </div></div>
+  <div class="sec"><div class="fgroup"><label>Observações</label><textarea id="se-obs" rows="2" placeholder="Notas adicionais…" style="resize:vertical"></textarea></div></div>
+</div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('seguros')">Cancelar</button><button class="btn btn-primary" onclick="saveRecord('seguros')">💾 Salvar</button></div></div></div>
+
+<!-- MODAL VER SEGUROS -->
+<div class="overlay" id="modal-ver-seguros"><div class="modal"><div class="modal-hdr"><div style="flex:1"><div class="modal-title" id="ver-seguros-title" style="font-size:16px">—</div><div class="modal-sub" id="ver-seguros-sub">—</div></div><button class="hbtn-icon" onclick="closeModal('ver-seguros')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body" id="ver-seguros-body" style="padding:0;gap:0"></div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('ver-seguros')">Fechar</button><button class="btn btn-primary" id="ver-seguros-edit-btn">✏️ Editar</button></div></div></div>
 
 <!-- IMPORT -->
 <div class="overlay" id="modal-import"><div class="modal"><div class="modal-hdr"><div><div class="modal-title">Importar Planilha</div><div class="modal-sub">CSV e Excel</div></div><button class="hbtn-icon" onclick="closeModal('import')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body"><div id="imp-s1"><div id="imp-drop" onclick="document.getElementById('imp-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleDrop(event)" style="border:3px dashed var(--border2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;background:var(--surface2)"><div style="font-size:32px;margin-bottom:10px;opacity:.5">📊</div><div style="font-weight:800;font-size:14px">Arraste ou clique para selecionar</div><div style="font-size:12px;color:var(--text3);font-weight:600;margin-top:4px">.csv · .xlsx · .xls</div></div><input type="file" id="imp-file" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(event)"></div><div id="imp-s2" style="display:none"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px"><div class="fgroup"><label>Módulo *</label><select id="imp-dest" onchange="buildMapping()"><option value="">— Selecione —</option><option value="torre">Torre</option><option value="terc">Terceirizadas</option><option value="armario">Armários</option><option value="segware">Segware</option><option value="selbit">Selbit</option></select></div><div class="fgroup"><label>Linha cabeçalho</label><input type="number" id="imp-hrow" value="1" min="1" max="20" onchange="reparseFile()"></div></div><div id="imp-map-wrap" style="display:none"><div class="sec-lbl" style="color:var(--accent)">Mapeamento</div><div id="imp-map-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px"></div></div></div><div id="imp-s3" style="display:none"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div class="sec-lbl" style="color:var(--green);margin-bottom:0;flex:1">Pré-visualização</div><span id="imp-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);font-weight:700"></span></div><div style="overflow:auto;max-height:200px;border-radius:10px;border:2px solid var(--border)"><table id="imp-prev-tbl" style="width:100%;border-collapse:collapse;font-size:12px"><thead id="imp-prev-hdr"></thead><tbody id="imp-prev-body"></tbody></table></div><div id="imp-warns" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"></div></div></div><div class="modal-ftr"><span id="imp-status" style="font-size:11px;color:var(--text3);margin-right:auto;font-weight:700"></span><button class="btn btn-ghost" onclick="closeModal('import')">Cancelar</button><button class="btn btn-primary" id="imp-confirm" onclick="confirmImport()" style="display:none">✓ Confirmar</button></div></div></div>
@@ -814,7 +856,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 const SUPA_URL='https://ojelxrdxypmpawcrjsru.supabase.co';
 const SUPA_KEY='sb_publishable__YHRZ8I6CvIDa4AB5UnU4A_QihfGYuG';
 const FILIAIS=['AMAZONAS','CEARÁ','MARANHÃO','PIAUÍ'];
-const TABLES=['torre','terc','armario','segware','selbit'];
+const TABLES=['torre','terc','armario','segware','selbit','seguros'];
 
 // ══════════════════════════════════════════
 // SUPABASE API — XMLHttpRequest puro
@@ -898,7 +940,7 @@ async function sbDel(t, id){
 // ══════════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════════
-const DB={torre:[],terc:[],armario:[],segware:[],selbit:[]};
+const DB={torre:[],terc:[],armario:[],segware:[],selbit:[],seguros:[]};
 const EST={torre:{},armario:{}};
 const HIST={torre:[],armario:[]};
 const KEY='auditoria_v5';
@@ -1094,6 +1136,19 @@ function normalizeRecord(table, row){
     r.portas   = Number(r.portas   || 0);
     r.total    = Number(r.total    || r.vcliente || 0);
   }
+  // Seguros (Solicitações de Seguro)
+  if(table==='seguros'){
+    r.filial    = _normFilial(r.filial||'');
+    r.valor     = Number(r.valor || r.valor_indenizado || 0);
+    r.servico   = r.servico  || '';
+    r.status    = r.status   || 'Aberta';
+    r.sinistro  = r.sinistro || r.tipo_sinistro || '';
+    r.indeniz   = r.indeniz  || r.indenizacao_recebida || '';
+    r.cliente   = r.cliente  || '';
+    r.descricao = r.descricao || r.desc || '';
+    r.data_resp = r.data_resp || r.dataResp || '';
+    r.data_pag  = r.data_pag  || r.dataPag  || '';
+  }
   // Terc/Segware/Selbit
   if(['terc','segware','selbit'].includes(table)){
     r.total = Number(r.total || 0);
@@ -1251,15 +1306,16 @@ function goTab(id,btn){
   if(id==='armario')renderArmario();
   if(id==='segware')renderSegware();
   if(id==='selbit')renderSelbit();
+  if(id==='seguros')renderSeguros();
 }
 
 // ══════════════════════════════════════════
 // MODAIS
 // ══════════════════════════════════════════
-const _ed={torre:null,terc:null,armario:null,segware:null,selbit:null};
-const MOD_LABELS={torre:'Torre',terc:'Terceirizada',armario:'Armário',segware:'Segware',selbit:'Selbetti'};
+const _ed={torre:null,terc:null,armario:null,segware:null,selbit:null,seguros:null};
+const MOD_LABELS={torre:'Torre',terc:'Terceirizada',armario:'Armário',segware:'Segware',selbit:'Selbetti',seguros:'Seguro'};
 
-function populateFilialSelects(){['t-filial','a-filial'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">— Selecione —</option>'+FILIAIS.map(f=>`<option value="${f}">${f}</option>`).join('');});}
+function populateFilialSelects(){['t-filial','a-filial','se-filial'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">— Selecione —</option>'+FILIAIS.map(f=>`<option value="${f}">${f}</option>`).join('');});}
 
 function openModal(type,id){populateFilialSelects();_ed[type]=id||null;document.getElementById('modal-'+type).classList.add('open');const t=document.getElementById('modal-'+type+'-title');if(t)t.textContent=(id?'Editar':'Novo')+' — '+MOD_LABELS[type];if(id){const r=DB[type].find(x=>x.id===id);if(r)fillForm(type,r);}else clearForm(type);}
 function closeModal(type){const el=document.getElementById('modal-'+type);if(el)el.classList.remove('open');if(_ed[type]!==undefined)_ed[type]=null;if(type==='import')resetImport();}
@@ -1270,7 +1326,8 @@ const FIELDS={
   terc:[['e-cod','cod'],['e-emp','empresa'],['e-qtd','qtd'],['e-unit','unit'],['e-per','period']],
   armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-prevpag','prevpag'],['a-entrada','entrada'],['a-frete','frete'],['a-gestao','gestao'],['a-locacao','locacao'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
   segware:[['sg-produto','produto'],['sg-qtd','qtd'],['sg-unit','unit'],['sg-per','period']],
-  selbit:[['sl-id','sid'],['sl-desc','desc'],['sl-local','local'],['sl-per','period'],['sl-imp-pb','impPB'],['sl-imp-color','impColor'],['sl-valor','valor'],['sl-vl-pb','vlPB'],['sl-vl-color','vlColor']]
+  selbit:[['sl-id','sid'],['sl-desc','desc'],['sl-local','local'],['sl-per','period'],['sl-imp-pb','impPB'],['sl-imp-color','impColor'],['sl-valor','valor'],['sl-vl-pb','vlPB'],['sl-vl-color','vlColor']],
+  seguros:[['se-data','data'],['se-cliente','cliente'],['se-conta','conta'],['se-filial','filial'],['se-servico','servico'],['se-resp','resp'],['se-sinistro','sinistro'],['se-desc','descricao'],['se-status','status'],['se-dataresp','data_resp'],['se-indeniz','indeniz'],['se-valor','valor'],['se-datapag','data_pag'],['se-obs','obs']]
 };
 
 function clearForm(t){
@@ -1280,6 +1337,7 @@ function clearForm(t){
   if(t==='armario'){document.getElementById('a-status').value='ativo';updateStatusColor('a-status');calcA();}
   if(t==='segware')document.getElementById('sg-per').value=nowM();
   if(t==='selbit')document.getElementById('sl-per').value=nowM();
+  if(t==='seguros'){const d=document.getElementById('se-data');if(d)d.value=new Date().toISOString().slice(0,10);const st=document.getElementById('se-status');if(st){st.value='Aberta';updateStatusColorSeg();}}
 }
 function fillForm(t,r){
   (FIELDS[t]||[]).forEach(([id,k])=>{const el=document.getElementById(id);if(el&&r[k]!==undefined)el.value=r[k];});
@@ -1297,6 +1355,7 @@ function fillForm(t,r){
   }
   if(t==='segware')calcSG();
   if(t==='selbit')calcSL();
+  if(t==='seguros')updateStatusColorSeg();
 }
 
 function updateStatusColor(id){
@@ -1374,6 +1433,7 @@ function saveRecord(type){
   }
   else if(type==='segware'){if(!gi('sg-produto')||!gi('sg-per'))return alert('Preencha Produto e Período.');const qtd=gn('sg-qtd'),unit=gn('sg-unit');upsert('segware',{produto:gi('sg-produto'),qtd,unit,total:qtd*unit,period:gi('sg-per')});closeModal('segware');renderSegware();renderDash();}
   else if(type==='selbit'){if(!gi('sl-id')||!gi('sl-desc')||!gi('sl-per'))return alert('Preencha ID, Descrição e Período.');const impPB=gn('sl-imp-pb'),impColor=gn('sl-imp-color'),valor=gn('sl-valor'),vlPB=gn('sl-vl-pb'),vlColor=gn('sl-vl-color'),totPB=impPB*vlPB,totColor=impColor*vlColor,total=valor+totPB+totColor;const rec={sid:gi('sl-id'),desc:gi('sl-desc'),local:gi('sl-local'),period:gi('sl-per'),impPB,impColor,valor,vlPB,vlColor,totPB,totColor,total};let final;if(_ed.selbit){const i=DB.selbit.findIndex(x=>x.id===_ed.selbit);if(i>=0){DB.selbit[i]={...DB.selbit[i],...rec};final=DB.selbit[i];}}else{final={id:uid(),...rec};DB.selbit.push(final);}save();updateBadges();if(final)saveToSupabase('selbit',final);closeModal('selbit');renderSelbit();renderDash();}
+  else if(type==='seguros'){if(!gi('se-data')||!gi('se-cliente')||!gi('se-filial'))return alert('Preencha Data, Cliente e Filial.');upsert('seguros',{data:gi('se-data'),cliente:gi('se-cliente'),conta:gi('se-conta'),filial:_normFilial(gi('se-filial')),servico:gi('se-servico'),resp:gi('se-resp'),sinistro:gi('se-sinistro'),descricao:gi('se-desc'),status:gi('se-status'),data_resp:gi('se-dataresp'),indeniz:gi('se-indeniz'),valor:gn('se-valor'),data_pag:gi('se-datapag'),obs:gi('se-obs')});closeModal('seguros');renderSeguros();updateBadges();renderDash();}
 }
 
 function upsert(t,rec){
@@ -1501,7 +1561,7 @@ function upsert(t,rec){
 let _del=null;
 function askDelete(t,id,lbl){_del={t,id};document.getElementById('confirm-sub').textContent=`"${lbl}" será removido permanentemente.`;document.getElementById('confirm-dlg').classList.add('open');}
 function closeConfirm(){document.getElementById('confirm-dlg').classList.remove('open');_del=null;}
-function execDelete(){if(!_del)return;const{t,id}=_del;DB[t]=DB[t].filter(x=>x.id!==id);save();deleteFromSupabase(t,id);closeConfirm();updateBadges();({torre:renderTorre,terc:()=>{renderTerc();renderTercPivot();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit})[t]?.();renderDash();}
+function execDelete(){if(!_del)return;const{t,id}=_del;DB[t]=DB[t].filter(x=>x.id!==id);save();deleteFromSupabase(t,id);closeConfirm();updateBadges();({torre:renderTorre,terc:()=>{renderTerc();renderTercPivot();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit,seguros:renderSeguros})[t]?.();renderDash();}
 
 function updateBadges(){Object.keys(DB).forEach(k=>{const el=document.getElementById('nb-'+k);if(el)el.textContent=DB[k].length;});}
 function intelBadge(tipo){
@@ -2229,11 +2289,11 @@ function renderHistorico(tipo){
 // RENDER TABLES
 // ══════════════════════════════════════════
 // ── SELEÇÃO MÚLTIPLA ──
-const _selected={torre:new Set(),terc:new Set(),armario:new Set(),segware:new Set(),selbit:new Set()};
+const _selected={torre:new Set(),terc:new Set(),armario:new Set(),segware:new Set(),selbit:new Set(),seguros:new Set()};
 function toggleSelect(tab,id,cb){if(cb.checked)_selected[tab].add(id);else _selected[tab].delete(id);updateBulkBar(tab);}
 function updateBulkBar(tab){const bar=document.getElementById('bulk-'+tab);const cnt=document.getElementById('bulk-'+tab+'-count');const n=_selected[tab].size;if(bar)bar.classList.toggle('show',n>0);if(cnt)cnt.textContent=n+' selecionado'+(n!==1?'s':'');}
 function clearBulk(tab){_selected[tab].clear();updateBulkBar(tab);document.querySelectorAll('.row-check[data-tab="'+tab+'"]').forEach(cb=>cb.checked=false);}
-function bulkDelete(tab){const ids=[..._selected[tab]];if(!ids.length)return;if(!confirm('Excluir '+ids.length+' registro(s) permanentemente?'))return;ids.forEach(id=>{DB[tab]=DB[tab].filter(x=>x.id!==id);sbDel(tab,id);});_selected[tab].clear();save();updateBadges();updateBulkBar(tab);({torre:renderTorre,terc:()=>{renderTerc();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit})[tab]?.();renderDash();showToast(ids.length+' registro(s) excluído(s)','ok');}
+function bulkDelete(tab){const ids=[..._selected[tab]];if(!ids.length)return;if(!confirm('Excluir '+ids.length+' registro(s) permanentemente?'))return;ids.forEach(id=>{DB[tab]=DB[tab].filter(x=>x.id!==id);sbDel(tab,id);});_selected[tab].clear();save();updateBadges();updateBulkBar(tab);({torre:renderTorre,terc:()=>{renderTerc();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit,seguros:renderSeguros})[tab]?.();renderDash();showToast(ids.length+' registro(s) excluído(s)','ok');}
 function selAllTab(tab,cb){document.querySelectorAll('.row-check[data-tab="'+tab+'"]').forEach(c=>{c.checked=cb.checked;if(cb.checked)_selected[tab].add(c.dataset.id);else _selected[tab].delete(c.dataset.id);});updateBulkBar(tab);}
 
 function renderTorre(){
@@ -2362,6 +2422,136 @@ function renderSelbit(){const fq=gi('f-selbit').toLowerCase(),fper=gi('f-selbit-
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('selbit','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('selbit','${r.id}','${(r.desc||r.sid||'').replace(/'/g,"\\'")}')">✕</button>
       </div></td></tr>`).join(''):emptyR(13);document.getElementById('tf-selbit').innerHTML=`<div class="tf-item"><span>PB</span><strong style="color:var(--blue)">${fmt(sum(rows,'totPB'))}</strong></div><div class="tf-item"><span>Color</span><strong style="color:var(--orange)">${fmt(sum(rows,'totColor'))}</strong></div><div class="tf-item"><span>Total</span><strong>${fmt(sum(rows,'total'))}</strong></div>`;}
+
+// ══════════════════════════════════════════
+// SEGUROS · Solicitações de Seguro
+// ══════════════════════════════════════════
+const _segStatusBadge=s=>({'Paga':'bg-green','Aprovada':'bg-cyan','Em Análise':'bg-blue','Documentação Pendente':'bg-amber','Aberta':'bg-purple','Negada':'bg-red'})[s]||'bg-blue';
+const _segIndBadge=i=>({'Sim':'bg-green','Parcial':'bg-amber','Não':'bg-red'})[i]||'';
+const _fmtD=d=>{if(!d)return'—';const s=String(d).slice(0,10);const p=s.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:s;};
+
+function updateStatusColorSeg(){
+  const el=document.getElementById('se-status');if(!el)return;
+  const map={'Paga':{bg:'var(--green-l)',b:'var(--green)',c:'var(--green-t)'},'Aprovada':{bg:'var(--cyan-l)',b:'var(--cyan)',c:'var(--cyan-t)'},'Negada':{bg:'var(--red-l)',b:'var(--red)',c:'var(--red-t)'},'Documentação Pendente':{bg:'var(--amber-l)',b:'var(--amber)',c:'var(--amber-t)'}};
+  const s=map[el.value]||{bg:'var(--surface)',b:'var(--border)',c:'var(--text)'};
+  el.style.background=s.bg;el.style.borderColor=s.b;el.style.color=s.c;el.style.fontWeight='800';el.style.transition='.2s';
+}
+
+function renderSeguros(){
+  const selFil=document.getElementById('f-seguros-fil');
+  if(selFil){const a=selFil.value;const fs=[...new Set(DB.seguros.map(r=>_normFilial(r.filial||'')).filter(Boolean))].sort();selFil.innerHTML='<option value="">Todas</option>'+fs.map(f=>`<option value="${f}"${f===a?' selected':''}>${f}</option>`).join('');}
+  const fq=gi('f-seguros').toLowerCase(),ffil=gi('f-seguros-fil'),fst=gi('f-seguros-st'),find=gi('f-seguros-ind');
+  const rows=DB.seguros.filter(r=>
+    (!fq||(r.cliente||'').toLowerCase().includes(fq)||(r.conta||'').toLowerCase().includes(fq))&&
+    (!ffil||_normFilial(r.filial||'')===ffil)&&
+    (!fst||r.status===fst)&&
+    (!find||r.indeniz===find)
+  ).sort((a,b)=>String(b.data||'').localeCompare(String(a.data||'')));
+  document.getElementById('tb-seguros').innerHTML=rows.length?rows.map((r,i)=>`<tr>
+    <td style="font-family:var(--mono);color:var(--text3);font-size:12px">${i+1}</td>
+    <td style="font-family:var(--mono);font-size:12px">${_fmtD(r.data)}</td>
+    <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSeguros('${r.id}')" title="Ver detalhes">🔍 ${r.cliente||'—'}</td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${r.conta||'—'}</td>
+    <td><span class="badge bg-blue">${r.filial||'—'}</span></td>
+    <td style="font-size:12px">${r.servico||'—'}</td>
+    <td style="font-size:12px;color:var(--text3)">${r.sinistro||'—'}</td>
+    <td><span class="badge ${_segStatusBadge(r.status)}">${r.status||'—'}</span></td>
+    <td>${r.indeniz?`<span class="badge ${_segIndBadge(r.indeniz)}">${r.indeniz}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
+    <td style="color:var(--green);font-weight:800;font-family:var(--mono)">${r.valor>0?fmt(r.valor):'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('seguros','${r.id}')">✏️</button>
+      <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('seguros','${r.id}','${(r.cliente||'').replace(/'/g,"\\'")}')">✕</button>
+    </div></td></tr>`).join(''):emptyR(11);
+  const totVal=sum(rows,'valor');
+  document.getElementById('tf-seguros').innerHTML=`<div class="tf-item"><span>Solicitações</span><strong style="color:var(--blue)">${rows.length}</strong></div><div class="tf-item"><span>💰 Total Indenizado</span><strong style="color:var(--green)">${fmt(totVal)}</strong></div>`;
+  renderSegurosResumo();
+}
+
+function renderSegurosResumo(){
+  const el=document.getElementById('seguros-resumo');if(!el)return;
+  const all=DB.seguros;
+  const total=all.length;
+  const recSim=all.filter(r=>r.indeniz==='Sim').length;
+  const recParc=all.filter(r=>r.indeniz==='Parcial').length;
+  const recNao=all.filter(r=>r.indeniz==='Não').length;
+  const valTotal=sum(all.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial'),'valor');
+  const STATUS=['Aberta','Em Análise','Documentação Pendente','Aprovada','Negada','Paga'];
+  const byStatus=STATUS.map(s=>({s,n:all.filter(r=>r.status===s).length}));
+  const stat=(num,lbl,col)=>`<div style="flex:1;min-width:110px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:22px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div></div>`;
+  const chip=(s,n)=>`<span class="badge ${_segStatusBadge(s)}" style="font-size:11px">${s}: ${n}</span>`;
+  el.innerHTML=`
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+      ${stat(total,'Total','var(--accent)')}
+      ${stat(recSim,'Recebidas','var(--green)')}
+      ${stat(recParc,'Parciais','var(--amber)')}
+      ${stat(recNao,'Não Recebidas','var(--red)')}
+      ${stat(fmt(valTotal),'Valor Indenizado','var(--green)')}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase">Por status:</span>
+      ${byStatus.filter(x=>x.n>0).map(x=>chip(x.s,x.n)).join('')||'<span style="color:var(--text3);font-size:12px">Sem registros</span>'}
+    </div>`;
+}
+
+function verSeguros(id){
+  const r=DB.seguros.find(x=>x.id===id);if(!r)return;
+  document.getElementById('ver-seguros-title').textContent=r.cliente||'—';
+  document.getElementById('ver-seguros-sub').textContent=(r.filial||'—')+' · '+(r.servico||'Seguro');
+  document.getElementById('ver-seguros-edit-btn').onclick=()=>{closeModal('ver-seguros');openModal('seguros',id);};
+  document.getElementById('ver-seguros-body').innerHTML=`
+    ${_verSection('Solicitação')}
+    ${_verGrid('1fr 1fr',
+      _verCard('Data',_fmtD(r.data))+
+      _verCard('Conta',r.conta||'—')+
+      _verCard('Filial',`<span class="badge bg-blue">${r.filial||'—'}</span>`)+
+      _verCard('Serviço',r.servico||'—')+
+      _verCard('Responsável',r.resp||'—')+
+      _verCard('Status',`<span class="badge ${_segStatusBadge(r.status)}">${r.status||'—'}</span>`)
+    )}
+    ${_verSection('Sinistro')}
+    ${_verGrid('1fr 1fr',
+      _verCard('Tipo',r.sinistro||'—')+
+      _verCard('Descrição',r.descricao||'—')
+    )}
+    ${_verSection('Seguradora / Indenização')}
+    ${_verGrid('1fr 1fr 1fr',
+      _verCard('Resposta Seguradora',_fmtD(r.data_resp))+
+      _verCard('Indenização',r.indeniz?`<span class="badge ${_segIndBadge(r.indeniz)}">${r.indeniz}</span>`:'—')+
+      _verCard('Pagamento Cliente',_fmtD(r.data_pag))
+    )}
+    ${_verGrid('1fr',_verMoney('Valor Indenizado',r.valor,'var(--green)'))}
+    ${r.obs?_verSection('Observações')+`<div style="padding:0 16px 16px;font-size:13px;color:var(--text2);line-height:1.5">${r.obs}</div>`:''}
+  `;
+  document.getElementById('modal-ver-seguros').classList.add('open');
+}
+
+function exportSegurosXLSX(){
+  if(typeof XLSX==='undefined')return alert('Aguarde, biblioteca carregando...');
+  if(!DB.seguros.length)return alert('Sem dados.');
+  const wb=XLSX.utils.book_new();
+  // Aba 1 — registros
+  const H=['Nº','Data da Solicitação','Cliente','Conta','Filial','Serviço','Tipo de Sinistro','Descrição da Ocorrência','Responsável pela Solicitação','Status','Data da Resposta da Seguradora','Indenização Recebida?','Valor Indenizado (R$)','Data do Pagamento ao Cliente','Observações'];
+  const ordered=[...DB.seguros].sort((a,b)=>String(a.data||'').localeCompare(String(b.data||'')));
+  const rows=ordered.map((r,i)=>[i+1,r.data||'',r.cliente||'',r.conta||'',r.filial||'',r.servico||'',r.sinistro||'',r.descricao||'',r.resp||'',r.status||'',r.data_resp||'',r.indeniz||'',r.valor||0,r.data_pag||'',r.obs||'']);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([H,...rows]),'Solicitações de Seguro');
+  // Aba 2 — resumo calculado
+  const total=DB.seguros.length;
+  const recSim=DB.seguros.filter(r=>r.indeniz==='Sim').length;
+  const recParc=DB.seguros.filter(r=>r.indeniz==='Parcial').length;
+  const recNao=DB.seguros.filter(r=>r.indeniz==='Não').length;
+  const valTotal=DB.seguros.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial').reduce((s,r)=>s+(Number(r.valor)||0),0);
+  const svcs=[...new Set(DB.seguros.map(r=>r.servico).filter(Boolean))];
+  const STATUS=['Aberta','Em Análise','Documentação Pendente','Aprovada','Negada','Paga'];
+  const res=[['Resumo de Solicitações de Seguro'],[],
+    ['Total de Solicitações',total],['Indenizações Recebidas (Sim)',recSim],['Indenizações Parciais',recParc],['Indenizações Não Recebidas',recNao],['Valor Total Indenizado (R$)',valTotal],[],[],
+    ['Detalhamento por Serviço'],['Serviço','Qtde Solicitações','Valor Indenizado (R$)']];
+  svcs.forEach(s=>res.push([s,DB.seguros.filter(r=>r.servico===s).length,DB.seguros.filter(r=>r.servico===s).reduce((a,r)=>a+(Number(r.valor)||0),0)]));
+  res.push(['Total',total,valTotal],[],[],['Solicitações por Status',null,null,'Indenização Recebida'],['Status','Qtde',null,'Status','Qtde']);
+  const indRows=[['Sim',recSim],['Não',recNao],['Parcial',recParc]];
+  STATUS.forEach((s,i)=>res.push([s,DB.seguros.filter(r=>r.status===s).length,null,(indRows[i]||[null])[0],(indRows[i]||[null,null])[1]]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(res),'Resumo');
+  XLSX.writeFile(wb,`Solicitacoes_de_Seguro_${nowM()}.xlsx`);
+}
 
 // ══════════════════════════════════════════
 // DASHBOARD
@@ -2879,7 +3069,8 @@ const TAB_MAPS={
   terc:{h:['Cod','Empresa','Qtd','ValUnit','Total','Period'],r:r=>[r.cod,r.empresa,r.qtd,r.unit,r.total,r.period]},
   armario:{h:['Cond','Filial','Fornec','Portas','ValCliente','ValFornec','Total','Endereço','Obs','Status'],r:r=>[r.cond,r.filial,r.fornecedor,r.portas,r.vcliente,r.vforn,r.total,r.endereco||'',r.obs||'',r.status]},
   segware:{h:['Produto','Qtd','ValUnit','Total','Period'],r:r=>[r.produto,r.qtd,r.unit,r.total,r.period]},
-  selbit:{h:['ID','Desc','Local','Valor','ImpPB','ImpColor','VlPB','VlColor','TotPB','TotColor','Total','Period'],r:r=>[r.sid,r.desc,r.local,r.valor,r.impPB,r.impColor,r.vlPB,r.vlColor,r.totPB,r.totColor,r.total,r.period]}
+  selbit:{h:['ID','Desc','Local','Valor','ImpPB','ImpColor','VlPB','VlColor','TotPB','TotColor','Total','Period'],r:r=>[r.sid,r.desc,r.local,r.valor,r.impPB,r.impColor,r.vlPB,r.vlColor,r.totPB,r.totColor,r.total,r.period]},
+  seguros:{h:['Data','Cliente','Conta','Filial','Serviço','Sinistro','Descrição','Responsável','Status','Data Resposta','Indenização','Valor','Data Pagamento','Obs'],r:r=>[r.data,r.cliente,r.conta,r.filial,r.servico,r.sinistro,r.descricao,r.resp,r.status,r.data_resp,r.indeniz,r.valor,r.data_pag,r.obs]}
 };
 
 const dl=(href,name)=>{const a=document.createElement('a');a.href=href;a.download=name;a.click();};
@@ -2983,7 +3174,7 @@ function confirmImport(){
   closeModal('import');
   // Re-render tudo
   renderDash();
-  renderMonuv();renderTorre();renderTerc();renderTercPivot();renderArmario();renderSegware();renderSelbit();
+  renderMonuv();renderTorre();renderTerc();renderTercPivot();renderArmario();renderSegware();renderSelbit();renderSeguros();
 }
 function buildRow(dest,mapped,headers){
   const r={id:uid()};
@@ -3044,12 +3235,14 @@ function renderAll(){
   else if(activeId==='armario') renderArmario();
   else if(activeId==='segware') renderSegware();
   else if(activeId==='selbit') renderSelbit();
+  else if(activeId==='seguros') renderSeguros();
   setTimeout(()=>{
     if(activeId!=='torre') renderTorre();
     if(activeId!=='terc'){renderTerc();renderTercPivot();}
     if(activeId!=='armario') renderArmario();
     if(activeId!=='segware') renderSegware();
     if(activeId!=='selbit') renderSelbit();
+    if(activeId!=='seguros') renderSeguros();
   }, 100);
 }
 
