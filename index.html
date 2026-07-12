@@ -2529,7 +2529,7 @@ function renderSegurosResumo(){
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
         ${_segChartBox('Valor Indenizado por Serviço','seg-ch-valserv')}
         ${_segChartBox('Qtde de Solicitações por Serviço','seg-ch-qtdserv')}
-        ${_segChartBox('Solicitações por Status','seg-ch-status')}
+        ${_segChartBox('Solicitações por Status','seg-ch-status',220)}
         ${_segChartBox('Indenização Recebida','seg-ch-indeniz')}
       </div>
     </div>`;
@@ -2537,10 +2537,10 @@ function renderSegurosResumo(){
   setTimeout(()=>_segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}),30);
 }
 
-function _segChartBox(title,id){
+function _segChartBox(title,id,h){
   return `<div style="background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow-xs)">
     <div style="font-size:12px;font-weight:800;color:var(--text2);margin-bottom:8px;text-align:center">${title}</div>
-    <div style="position:relative;height:180px"><canvas id="${id}"></canvas></div>
+    <div style="position:relative;height:${h||180}px"><canvas id="${id}"></canvas></div>
   </div>`;
 }
 
@@ -2558,10 +2558,10 @@ function _segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}){
   const qtdServ=SERVICOS.map(s=>all.filter(r=>r.servico===s).length);
   mk('seg-ch-qtdserv',{type:'bar',data:{labels:SERVICOS,datasets:[{data:qtdServ,backgroundColor:'#0369a1cc',borderColor:'#0369a1',borderWidth:1,borderRadius:4}]},options:baseOpts()});
 
-  // 3) Solicitações por Status (barras)
+  // 3) Solicitações por Status (barras horizontais — evita cortar/inclinar nomes longos)
   const stData=STATUS.map(s=>all.filter(r=>r.status===s).length);
   const stCols={'Aberta':'#7c3aed','Em Análise':'#0369a1','Documentação Pendente':'#d97706','Aprovada':'#0891b2','Negada':'#dc2626','Paga':'#16a34a'};
-  mk('seg-ch-status',{type:'bar',data:{labels:STATUS.map(s=>s.length>12?s.slice(0,11)+'…':s),datasets:[{data:stData,backgroundColor:STATUS.map(s=>stCols[s]+'cc'),borderColor:STATUS.map(s=>stCols[s]),borderWidth:1,borderRadius:4}]},options:baseOpts()});
+  mk('seg-ch-status',{type:'bar',data:{labels:STATUS,datasets:[{data:stData,backgroundColor:STATUS.map(s=>stCols[s]+'cc'),borderColor:STATUS.map(s=>stCols[s]),borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,grid:{color:grid},ticks:{color:txt,font:{size:10},precision:0}},y:{grid:{display:false},ticks:{color:txt,font:{size:11}}}}}});
 
   // 4) Indenização Recebida (pizza)
   const indData=[recSim,recNao,recParc];
