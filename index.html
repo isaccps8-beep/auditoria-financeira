@@ -331,6 +331,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div id="dash-seguros-panel" style="display:none"></div>
   <!-- CONTEÚDO NORMAL (faturamento) -->
   <div id="dash-normal">
+  <div id="dash-lucro" style="margin-bottom:16px"></div>
   <!-- CHARTS: 3 gráficos fixos — respondem ao KPI selecionado -->
   <div class="charts-3" style="margin-bottom:16px">
     <div class="card">
@@ -1281,6 +1282,61 @@ const totArmario=()=>DB.armario.filter(r=>r.status==='ativo').reduce((a,b)=>a+_v
 const totSegware=p=>sum(p?DB.segware.filter(r=>r.period===p):DB.segware,'total');
 const totSelbit=p=>sum(p?DB.selbit.filter(r=>r.period===p):DB.selbit,'total');
 const totSeguros=()=>DB.seguros.filter(r=>r.indeniz==='Sim'||r.indeniz==='Parcial').reduce((a,b)=>a+(Number(b.valor)||0),0);
+
+// ── Lucratividade (receita cliente vs custo empresa) — Torre e Armário ──
+const custoTorre=()=>DB.torre.filter(r=>r.status==='ativo').reduce((a,r)=>a+(Number(r.qtd)||0)*(Number(r.custo)||0),0);
+const custoArmario=()=>DB.armario.filter(r=>r.status==='ativo').reduce((a,r)=>a+(Number(r.vforn)||0),0);
+function calcLucro(){
+  const recT=totTorre(), custoT=custoTorre();
+  const recA=totArmario(), custoA=custoArmario();
+  const rec=recT+recA, custo=custoT+custoA, lucro=rec-custo;
+  return{
+    modulos:[
+      {nome:'Torre',   receita:recT, custo:custoT, lucro:recT-custoT, margem:recT>0?((recT-custoT)/recT*100):0},
+      {nome:'Armário', receita:recA, custo:custoA, lucro:recA-custoA, margem:recA>0?((recA-custoA)/recA*100):0},
+    ],
+    receita:rec, custo:custo, lucro:lucro, margem:rec>0?(lucro/rec*100):0
+  };
+}
+function renderLucro(){
+  const el=document.getElementById('dash-lucro');if(!el)return;
+  const L=calcLucro();
+  const pos=L.lucro>=0;
+  const cLucro=pos?'var(--green)':'var(--red)';
+  const stat=(num,lbl,col,extra)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:20px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div>${extra||''}</div>`;
+  const linha=m=>{
+    const p=m.lucro>=0;
+    return `<tr>
+      <td style="padding:8px 14px;font-weight:800">${m.nome}</td>
+      <td style="padding:8px 14px;text-align:right;font-family:var(--mono);color:var(--green)">${fmt(m.receita)}</td>
+      <td style="padding:8px 14px;text-align:right;font-family:var(--mono);color:var(--orange)">${fmt(m.custo)}</td>
+      <td style="padding:8px 14px;text-align:right;font-family:var(--mono);font-weight:800;color:${p?'var(--green)':'var(--red)'}">${p?'':'−'}${fmt(Math.abs(m.lucro))}</td>
+      <td style="padding:8px 14px;text-align:right;font-family:var(--mono);font-weight:800;color:${p?'var(--green)':'var(--red)'}">${m.margem.toFixed(1)}%</td>
+    </tr>`;
+  };
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px">
+      <div style="font-size:13px;font-weight:800;color:${cLucro};text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">${pos?'📈':'📉'} Lucratividade · Receita × Custo <span style="font-weight:600;color:var(--text3);text-transform:none">(Torre + Armário)</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        ${stat(fmt(L.receita),'Receita (Cliente)','var(--green)')}
+        ${stat(fmt(L.custo),'Custo (Empresa)','var(--orange)')}
+        ${stat((pos?'':'−')+fmt(Math.abs(L.lucro)),pos?'Lucro':'Prejuízo',cLucro)}
+        ${stat(L.margem.toFixed(1)+'%','Margem',cLucro)}
+      </div>
+      <div style="background:var(--surface);border:2px solid var(--border);border-radius:12px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr style="border-bottom:2px solid var(--border)">
+            <th style="padding:8px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Módulo</th>
+            <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Receita</th>
+            <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Custo</th>
+            <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Lucro</th>
+            <th style="padding:8px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Margem</th>
+          </tr></thead>
+          <tbody>${L.modulos.map(linha).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
 
 // ══════════════════════════════════════════
 // THEME
@@ -2761,6 +2817,7 @@ function _renderDashNow(){
     if(_segPanel)_segPanel.style.display='none';
   }
 
+  renderLucro();
   buildLine(period,svc);
   buildDoughnut(vm,vt,ve,va,vs,vsl);
   buildRanking(period,svc,vm,vt,ve,va,vs,vsl);
