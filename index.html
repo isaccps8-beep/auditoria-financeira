@@ -1450,6 +1450,8 @@ function upsert(t,rec){
   if(final){
     _pendingIds.add(final.id);
     const _toSend=Object.fromEntries(Object.entries(final).filter(([k])=>!k.startsWith('_')));
+    // Colunas date do Postgres não aceitam ''; converte campos de data vazios em null
+    ['data','data_resp','data_pag'].forEach(k=>{if(_toSend[k]==='')_toSend[k]=null;});
     saveToSupabase(t,_toSend).then(()=>{
       setTimeout(()=>_pendingIds.delete(final.id), 5000);
     });
@@ -3324,6 +3326,7 @@ async function pushAllToSupabase(){
   for(const t of TABLES){
     for(const r of DB[t]){
       const _toSend=Object.fromEntries(Object.entries(r).filter(([k])=>!k.startsWith('_')));
+      ['data','data_resp','data_pag'].forEach(k=>{if(_toSend[k]==='')_toSend[k]=null;});
       await saveToSupabase(t,_toSend);
       count++;
     }
