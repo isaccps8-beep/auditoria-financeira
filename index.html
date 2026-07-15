@@ -1031,12 +1031,13 @@ function hideSync(){const b=document.getElementById('sync-badge');if(b)b.classLi
 // PERSISTÊNCIA LOCAL
 // ══════════════════════════════════════════
 function save(){
+  const _payload=JSON.stringify({DB,EST,HIST,pending:[..._pendingIds]});
   try{
-    localStorage.setItem(KEY,JSON.stringify({DB,EST,HIST}));
+    localStorage.setItem(KEY,_payload);
   }catch(e){
     // localStorage bloqueado (Edge tracking prevention) - tenta sessionStorage
     try{
-      sessionStorage.setItem(KEY,JSON.stringify({DB,EST,HIST}));
+      sessionStorage.setItem(KEY,_payload);
       console.warn('[save] localStorage bloqueado, usando sessionStorage');
     }catch(e2){
       console.warn('[save] Armazenamento local bloqueado pelo browser - dados apenas em memória');
@@ -1063,6 +1064,7 @@ function load(){
       if(d.EST.armario) Object.entries(d.EST.armario).forEach(([k,v])=>{EST.armario[_normFilial(k)||k]=v;});
     }
     if(d.HIST){if(Array.isArray(d.HIST.torre))HIST.torre=d.HIST.torre;if(Array.isArray(d.HIST.armario))HIST.armario=d.HIST.armario;}
+    if(Array.isArray(d.pending)) d.pending.forEach(id=>_pendingIds.add(id));
     console.info('[cache] Carregado:',Object.keys(DB).map(k=>k+':'+DB[k].length).join(', '));
     return true;
   }catch(e){console.warn('load():',e);return false;}
@@ -1179,6 +1181,12 @@ async function loadFromSupabase(){
         const serverIds=new Set(normalized.map(x=>x.id));
         // Mantém registros locais PENDENTES (não confirmados ainda pelo servidor)
         const localPending=DB[r.value.t].filter(x=>_pendingIds.has(x.id)&&!serverIds.has(x.id));
+        // Reenvia automaticamente os pendentes ausentes no servidor
+        localPending.forEach(rec=>{
+          const _s=Object.fromEntries(Object.entries(rec).filter(([k])=>!k.startsWith('_')));
+          ['data','data_resp','data_pag'].forEach(k=>{if(_s[k]==='')_s[k]=null;});
+          saveToSupabase(r.value.t,_s).then(ok=>{if(ok){_pendingIds.delete(rec.id);save();}});
+        });
         // Usa versão LOCAL para pendentes já no servidor (mais recente)
         const serverWithLocalOverride=normalized.map(x=>
           _pendingIds.has(x.id) ? (DB[r.value.t].find(l=>l.id===x.id)||x) : x
@@ -1230,19 +1238,22 @@ async function saveToSupabase(t,r){
     if(!res){
       console.warn('[Supabase] saveToSupabase: sem resposta para',t,'id=',r.id);
       showToast('⚠ Supabase não respondeu ao salvar '+t,'error');
-      return;
+      return false;
     }
     if(res.ok===false){
       let msg='Erro desconhecido';
       try{const e=JSON.parse(res);msg=e.message||e.hint||msg;}catch{}
       console.error('[Supabase] ERRO ao salvar',t,':',msg,'| dados:',r);
       showToast('❌ Supabase: '+msg,'error');
+      return false;
     } else {
       console.info('[Supabase] ✓ Salvo:',t,'id=',r.id);
+      return true;
     }
   }catch(e){
     console.error('[Supabase] Exception ao salvar',t,':',e.message);
     showToast('❌ Sem conexão com Supabase — dado salvo só localmente','error');
+    return false;
   }
 }
 
@@ -1452,8 +1463,8 @@ function upsert(t,rec){
     const _toSend=Object.fromEntries(Object.entries(final).filter(([k])=>!k.startsWith('_')));
     // Colunas date do Postgres não aceitam ''; converte campos de data vazios em null
     ['data','data_resp','data_pag'].forEach(k=>{if(_toSend[k]==='')_toSend[k]=null;});
-    saveToSupabase(t,_toSend).then(()=>{
-      setTimeout(()=>_pendingIds.delete(final.id), 5000);
+    saveToSupabase(t,_toSend).then(ok=>{
+      if(ok){_pendingIds.delete(final.id);save();}
     });
   }
   if(t==='torre'&&final){
@@ -3327,10 +3338,12 @@ async function pushAllToSupabase(){
     for(const r of DB[t]){
       const _toSend=Object.fromEntries(Object.entries(r).filter(([k])=>!k.startsWith('_')));
       ['data','data_resp','data_pag'].forEach(k=>{if(_toSend[k]==='')_toSend[k]=null;});
-      await saveToSupabase(t,_toSend);
+      const ok=await saveToSupabase(t,_toSend);
+      if(ok)_pendingIds.delete(r.id);
       count++;
     }
   }
+  save();
   showToast('✓ '+count+' registros enviados ao Supabase','ok');
 }
 
