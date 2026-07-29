@@ -583,7 +583,8 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
       <div class="sec"><div class="sec-lbl" style="color:var(--cyan)">Equipamentos</div>
         <div class="fg-grid">
           <div class="fgroup"><label>Qtd. Torres</label><input type="number" id="t-qtd" min="0" placeholder="0" oninput="calcT()"></div>
-          <div class="fgroup"><label style="color:var(--amber)">⭐ Torres Gratificadas</label><input type="number" id="t-gratificadas" min="0" value="0" placeholder="0" oninput="calcT()" style="border-color:var(--amber);border-width:2px"></div>
+          <div class="fgroup"><label style="color:var(--amber)">⭐ Gratificado?</label><select id="t-grat-modo" onchange="onGratModoT()" style="border-color:var(--amber);border-width:2px"><option value="nao">Não</option><option value="todas">Sim (todas)</option><option value="parcial">Parcial</option></select></div>
+          <div class="fgroup" id="t-grat-qtd-wrap" style="display:none"><label style="color:var(--amber)">Qtd. Gratificadas</label><input type="number" id="t-grat-qtd" min="0" value="0" placeholder="0" oninput="calcT()" style="border-color:var(--amber);border-width:2px"></div>
           <div class="fgroup" style="grid-column:1/-1"><small id="t-cobradas-info" style="font-size:12px"></small></div>
           <div class="fgroup"><label>Câmeras</label><input type="number" id="t-cameras" min="0" placeholder="0"></div>
           <div class="fgroup"><label>Intel.</label><input type="number" id="t-intels" min="0" placeholder="0"></div>
@@ -619,7 +620,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 <div class="overlay" id="modal-armario"><div class="modal"><div class="modal-hdr"><div><div class="modal-title" id="modal-armario-title">Novo — Armário</div><div class="modal-sub">* obrigatórios</div></div><button class="hbtn-icon" onclick="closeModal('armario')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body">
   <div class="sec"><div class="sec-lbl" style="color:var(--accent)">Identificação</div><div class="fg-grid"><div class="fgroup"><label>Condomínio *</label><input id="a-cond" placeholder="Nome"></div><div class="fgroup"><label>Filial</label><select id="a-filial"><option value="">— Selecione —</option></select></div><div class="fgroup"><label>Modelo</label><input id="a-modelo" placeholder="Padrão"></div><div class="fgroup"><label>Fornecedor *</label><select id="a-forn"><option value="">— Selecione —</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fgroup"><label>Aquisição</label><select id="a-aquis"><option value="">— Selecione —</option><option>Exposec</option><option>Pós Exposec</option><option>Normal</option></select></div><div class="fgroup"><label>Status</label><select id="a-status" onchange="updateStatusColor('a-status')"><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div></div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--blue)">Contrato</div><div class="fg-grid"><div class="fgroup"><label>Qtd. Portas</label><input type="number" id="a-portas" min="0" placeholder="0" oninput="calcA()"></div>
-  <div class="fgroup"><label style="color:var(--amber)">⭐ Armários Gratificados</label><input type="number" id="a-gratificadas" min="0" value="0" placeholder="0" oninput="calcA()" style="border-color:var(--amber);border-width:2px"></div>
+  <div class="fgroup"><label style="color:var(--amber)">⭐ Gratificado?</label><select id="a-gratificadas" oninput="calcA()" onchange="calcA()" style="border-color:var(--amber);border-width:2px"><option value="0">Não</option><option value="1">Sim</option></select></div>
   <div class="fgroup" style="grid-column:1/-1"><small id="a-cobrados-info" style="font-size:12px"></small></div><div class="fgroup"><label>Nº Pedido</label><input id="a-pedido" placeholder="PED-001"></div><div class="fgroup"><label>Nº NF</label><input id="a-nf" placeholder="NF-0001"></div><div class="fgroup"><label>Data Instalação</label><input type="date" id="a-inst"></div><div class="fgroup"><label>Data Saída</label><input type="date" id="a-saida"></div><div class="fgroup"><label>Aditivo (meses)</label><input type="number" id="a-aditivo" min="0" placeholder="0"></div><div class="fgroup"><label>Carência (dias)</label><input type="number" id="a-carencia" min="0" placeholder="0"></div><div class="fgroup"><label>Prev. Pagamento</label><input type="date" id="a-prevpag"></div></div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid"><div class="fgroup"><label>Entrada (R$)</label><input type="number" id="a-entrada" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Frete (R$)</label><input type="number" id="a-frete" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Gestão (R$)</label><input type="number" id="a-gestao" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Locação (R$)</label><input type="number" id="a-locacao" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Val. Cliente (R$) *</label><input type="number" id="a-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcA()"></div><div class="fgroup"><label>Mensalidade (R$)</label><input type="number" id="a-mens" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Val. Fornecedor (R$)</label><input type="number" id="a-vforn" min="0" step=".01" placeholder="0,00"></div></div></div>
   <div class="calc-panel"><div class="sec-lbl" style="color:var(--green)">Total</div><div class="fg-grid" style="grid-template-columns:1fr 1fr"><div class="fgroup"><label>Total</label><input id="a-total" readonly style="color:var(--accent);font-weight:800"></div><div class="fgroup"><label>Obs.</label><input id="a-obs" placeholder="Anotações…"></div></div></div>
@@ -1366,7 +1367,7 @@ const FIELDS={
 
 function clearForm(t){
   (FIELDS[t]||[]).forEach(([id])=>{const el=document.getElementById(id);if(el){el.value='';el.style.background='';el.style.borderColor='';el.style.color='';}});
-  if(t==='torre'){document.getElementById('t-status').value='ativo';document.getElementById('t-contrato').value='Não';updateStatusColor('t-status');calcT();}
+  if(t==='torre'){document.getElementById('t-status').value='ativo';document.getElementById('t-contrato').value='Não';const _gm=document.getElementById('t-grat-modo');if(_gm)_gm.value='nao';const _gq=document.getElementById('t-grat-qtd');if(_gq)_gq.value=0;onGratModoT();updateStatusColor('t-status');calcT();}
   if(t==='terc')document.getElementById('e-per').value=nowM();
   if(t==='armario'){document.getElementById('a-status').value='ativo';updateStatusColor('a-status');calcA();}
   if(t==='segware')document.getElementById('sg-per').value=nowM();
@@ -1376,15 +1377,20 @@ function clearForm(t){
 function fillForm(t,r){
   (FIELDS[t]||[]).forEach(([id,k])=>{const el=document.getElementById(id);if(el&&r[k]!==undefined)el.value=r[k];});
   if(t==='torre'){
-    const _gEl=document.getElementById('t-gratificadas');
-    if(_gEl) _gEl.value=r.gratificadas||0;
-    calcT();
+    const g=Number(r.gratificadas||0), qtd=Number(r.qtd||0);
+    const modoEl=document.getElementById('t-grat-modo');
+    const qtdEl=document.getElementById('t-grat-qtd');
+    let modo='nao';
+    if(g>0) modo=(g>=qtd && qtd>0)?'todas':'parcial';
+    if(modoEl) modoEl.value=modo;
+    if(qtdEl) qtdEl.value=g;
+    onGratModoT();
     updateStatusColor('t-status');
   }
   if(t==='terc')calcE();
   if(t==='armario'){
     const _gaEl=document.getElementById('a-gratificadas');
-    if(_gaEl) _gaEl.value=r.gratificadas||0;
+    if(_gaEl) _gaEl.value=(r.gratificadas>0?'1':'0');
     calcA();updateStatusColor('a-status');
   }
   if(t==='segware')calcSG();
@@ -1414,27 +1420,43 @@ function updateStatusColor(id){
 const gi=id=>{const el=document.getElementById(id);return el?el.value.trim():''};
 const gn=id=>Number(gi(id))||0;
 function calcM(){const tc=gn('m-qcam')*gn('m-vcam'),ti=gn('m-qintel')*gn('m-vintel'),tt=gn('m-qtl')*gn('m-vtl');document.getElementById('m-tcam').value=fmt(tc);document.getElementById('m-tintel').value=fmt(ti);document.getElementById('m-ttl').value=fmt(tt);document.getElementById('m-total').value=fmt(tc+ti+tt);}
+function onGratModoT(){
+  const modo=gi('t-grat-modo');
+  const wrap=document.getElementById('t-grat-qtd-wrap');
+  if(wrap) wrap.style.display=(modo==='parcial')?'':'none';
+  calcT();
+}
+function _gratTorre(){
+  // Retorna o número de torres gratificadas conforme o modo selecionado
+  const modo=gi('t-grat-modo'),qtd=gn('t-qtd');
+  if(modo==='todas')return qtd;
+  if(modo==='parcial')return Math.min(qtd,Math.max(0,gn('t-grat-qtd')||0));
+  return 0;
+}
 function calcT(){
-  const qtd=gn('t-qtd'),grat=gn('t-gratificadas')||0,custo=gn('t-custo');
+  const qtd=gn('t-qtd'),custo=gn('t-custo'),vcliente=gn('t-vcliente');
+  const grat=_gratTorre();
   const cobradas=Math.max(0,qtd-grat);
   const custoEmpresa=qtd*custo;
   const el=document.getElementById('t-cobradas-info');
-  if(el) el.innerHTML=grat>0
-    ?'<span style="color:var(--amber)">⭐ '+grat+' gratificada'+(grat>1?'s':'')+' · Cobradas ao cliente: '+cobradas+'</span><br><span style="color:var(--orange)">Custo empresa: '+fmt(custoEmpresa)+'</span>'
-    :(custoEmpresa>0?'<span style="color:var(--orange)">Custo empresa: '+fmt(custoEmpresa)+'</span>':'');
+  if(el){
+    if(grat>0 && grat>=qtd) el.innerHTML='<span style="color:var(--amber)">⭐ Todas gratificadas — cliente não é cobrado</span>';
+    else if(grat>0) el.innerHTML='<span style="color:var(--amber)">⭐ '+grat+' gratificada'+(grat>1?'s':'')+' · '+cobradas+' cobrada'+(cobradas>1?'s':'')+' ao cliente</span>';
+    else el.innerHTML='';
+  }
   const ctEl=document.getElementById('t-custo-total');
   if(ctEl) ctEl.value=fmt(custoEmpresa);
-  document.getElementById('t-total').value=fmt(gn('t-vcliente'));
+  document.getElementById('t-total').value=fmt(vcliente);
 }
 function calcE(){document.getElementById('e-total').value=fmt(gn('e-qtd')*gn('e-unit'));}
 function calcA(){
-  const portas=gn('a-portas'),grat=gn('a-gratificadas')||0,vcliente=gn('a-vcliente');
-  const cobrados=Math.max(0,portas-grat);
+  const grat=(gn('a-gratificadas')||0)>0,vcliente=gn('a-vcliente');
+  const receita=grat?0:vcliente;
   const el=document.getElementById('a-cobrados-info');
-  if(el) el.innerHTML=grat>0
-    ?'<span style="color:var(--amber)">⭐ '+grat+' gratificado'+(grat>1?'s':'')+' · Cobrados ao cliente: '+cobrados+'</span>'
+  if(el) el.innerHTML=grat
+    ?'<span style="color:var(--amber)">⭐ Gratificado — cliente não é cobrado</span>'
     :'';
-  document.getElementById('a-total').value=fmt(vcliente);
+  document.getElementById('a-total').value=fmt(receita);
 }
 function calcSG(){document.getElementById('sg-total').value=fmt(gn('sg-qtd')*gn('sg-unit'));}
 function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn('sl-vl-color');document.getElementById('sl-tot-pb').value=fmt(p);document.getElementById('sl-tot-color').value=fmt(c);document.getElementById('sl-total').value=fmt(gn('sl-valor')+p+c);}
@@ -1443,7 +1465,7 @@ function calcSL(){const p=gn('sl-imp-pb')*gn('sl-vl-pb'),c=gn('sl-imp-color')*gn
 // SAVE RECORDS
 // ══════════════════════════════════════════
 function saveRecord(type){
-  if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=gn('t-gratificadas');upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
+  if(type==='torre'){if(!gi('t-cliente'))return alert('Informe o cliente.');const custo=gn('t-custo'),vcliente=gn('t-vcliente'),gratificadas=_gratTorre();upsert('torre',{cliente:gi('t-cliente'),filial:_normFilial(gi('t-filial')),status:gi('t-status'),tipo:gi('t-tipo'),contrato:gi('t-contrato'),data:gi('t-data'),qtd:gn('t-qtd'),cameras:gn('t-cameras'),intels:gn('t-intels'),tipoIntel:gi('t-tipo-intel'),custo,vcliente,endereco:gi('t-endereco'),obs:gi('t-obs'),gratificadas});closeModal('torre');
     renderTorre();
     updateBadges();
     const _dm = document.getElementById('dash-month');
@@ -1457,7 +1479,7 @@ function saveRecord(type){
     }
   }
   else if(type==='terc'){if(!gi('e-cod')||!gi('e-emp')||!gi('e-per'))return alert('Preencha Código, Empresa e Período.');const qtd=gn('e-qtd'),unit=gn('e-unit');const sim=DB.terc.filter(r=>r.empresa===gi('e-emp')&&r.id!==_ed.terc);const avg=sim.length?sim.reduce((a,b)=>a+(b.unit||0),0)/sim.length:0;upsert('terc',{cod:gi('e-cod'),empresa:gi('e-emp'),qtd,unit,total:qtd*unit,period:gi('e-per'),warn:avg>0&&Math.abs(unit-avg)/avg>0.5});closeModal('terc');renderTerc();renderTercPivot();renderDash();}
-  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),aquisicao:gi('a-aquis'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),prevpag:gi('a-prevpag'),entrada:gn('a-entrada'),frete:gn('a-frete'),gestao:gn('a-gestao'),locacao:gn('a-locacao'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:vcliente,gratificadas:gn('a-gratificadas')});closeModal('armario');
+  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');const gratA=(gn('a-gratificadas')||0)>0?1:0;upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),aquisicao:gi('a-aquis'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),prevpag:gi('a-prevpag'),entrada:gn('a-entrada'),frete:gn('a-frete'),gestao:gn('a-gestao'),locacao:gn('a-locacao'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:(gratA?0:vcliente),gratificadas:gratA});closeModal('armario');
     renderArmario();
     updateBadges();
     renderDash();
@@ -2366,15 +2388,9 @@ function renderTorre(){
       </td>
       <td style="text-align:center;white-space:nowrap">
         ${(r.gratificadas>0)
-          ? (r.qtd===r.gratificadas
-            // TODAS gratificadas → número dourado, borda dourada
-            ? `<span title="Todas as ${r.qtd} torres são bonificadas" style="display:inline-flex;align-items:center;justify-content:center;min-width:28px;background:var(--amber-l);border:2px solid var(--amber);border-radius:8px;padding:2px 10px;font-family:var(--mono);font-weight:900;font-size:13px;color:var(--amber);cursor:help">${r.qtd}</span>`
-            // ALGUMAS gratificadas → caixa dourada, formato "4/1"
-            : `<span title="${r.qtd} torres · ${r.gratificadas} bonificada(s) · ${Math.max(0,(r.qtd||0)-(r.gratificadas||0))} cobrada(s)" style="display:inline-flex;align-items:center;gap:2px;background:var(--amber-l);border:2px solid var(--amber);border-radius:8px;padding:2px 10px;font-family:var(--mono);font-weight:800;font-size:13px;cursor:help">
-                <span style="color:var(--text)">${r.qtd}</span>
-                <span style="color:var(--amber);font-size:11px">/</span>
-                <span style="color:var(--amber);font-weight:900">${r.gratificadas}</span>
-              </span>`)
+          ? ((r.gratificadas>=r.qtd)
+            ? `<span title="Todas as ${r.qtd} torre(s) gratificadas — cliente não é cobrado" style="display:inline-flex;align-items:center;gap:4px;background:var(--amber-l);border:2px solid var(--amber);border-radius:8px;padding:2px 10px;font-family:var(--mono);font-weight:800;font-size:13px;cursor:help"><span style="color:var(--text)">${r.qtd||0}</span><span style="color:var(--amber);font-weight:900">⭐</span></span>`
+            : `<span title="${r.qtd} torres · ${r.gratificadas} gratificada(s) · ${Math.max(0,(r.qtd||0)-(r.gratificadas||0))} cobrada(s)" style="display:inline-flex;align-items:center;gap:2px;background:var(--amber-l);border:2px solid var(--amber);border-radius:8px;padding:2px 10px;font-family:var(--mono);font-weight:800;font-size:13px;cursor:help"><span style="color:var(--text)">${r.qtd||0}</span><span style="color:var(--amber);font-size:11px">/</span><span style="color:var(--amber);font-weight:900">⭐${r.gratificadas}</span></span>`)
           : `<span class="badge bg-blue" style="min-width:28px;justify-content:center">${r.qtd||0}</span>`
         }
       </td>
@@ -2441,7 +2457,7 @@ function renderArmario(){
   const fq=gi('f-arm').toLowerCase(),ff=gi('f-arm-forn'),fst=gi('f-arm-st'),fcont=gi('f-arm-cont'),ffil=gi('f-arm-fil');
   const rows=DB.armario.filter(r=>(!fq||(r.cond||'').toLowerCase().includes(fq)||(r.filial||'').toLowerCase().includes(fq))&&(!ff||r.fornecedor===ff)&&(!fst||r.status===fst)&&(!fcont||r.contrato===fcont)&&(!ffil||_normFilial(r.filial||'')=== ffil));document.getElementById('tb-armario').innerHTML=rows.length?rows.map(r=>`<tr class="${(r.status==='inativo'||r.status==='pendente')?'row-warn':''}">
       <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="armario" data-id="${r.id}" onchange="toggleSelect('armario','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
-      <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verArmario('${r.id}')" title="Ver detalhes">🔍 ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td style="color:var(--text3)">${r.aquisicao||'—'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · ${r.gratificadas} gratificado(s)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--text3);font-size:10px">/</span><span style="color:var(--amber)">⭐${r.gratificadas}</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="font-family:var(--mono)">${fmt(r.entrada||0)}</td><td style="font-family:var(--mono)">${fmt(r.locacao||0)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td style="color:var(--accent);font-weight:800;font-family:var(--mono)">${fmt(r.total||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
+      <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verArmario('${r.id}')" title="Ver detalhes">🔍 ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td style="color:var(--text3)">${r.aquisicao||'—'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · Cortesia (cliente não é cobrado)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--amber)">⭐</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="font-family:var(--mono)">${fmt(r.entrada||0)}</td><td style="font-family:var(--mono)">${fmt(r.locacao||0)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td style="color:var(--accent);font-weight:800;font-family:var(--mono)">${fmt(r.total||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verArmario('${r.id}')">👁</button>
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('armario','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('armario','${r.id}','${(r.cond||'').replace(/'/g,"\\'")}')">✕</button>
