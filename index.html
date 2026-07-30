@@ -646,7 +646,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div class="fgroup"><label>Conta</label><input id="se-conta" placeholder="Ex: 8178"></div>
     <div class="fgroup"><label>Filial *</label><select id="se-filial"><option value="">— Selecione —</option></select></div>
     <div class="fgroup"><label>Serviço</label><select id="se-servico" onchange="onServicoSeguro()"><option value="">—</option><option>Alarme</option><option>Portaria</option></select></div>
-    <div class="fgroup" id="se-vigilante-wrap" style="display:none"><label style="color:var(--cyan-t)">🛡️ Vigilante da seguradora solicitado?</label><select id="se-vigilante" style="border-color:var(--cyan);border-width:2px"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
+    <div class="fgroup" id="se-vigilante-wrap" style="display:none"><label style="color:var(--cyan-t)">🛡️ Vigilante da seguradora?</label><select id="se-vigilante" onchange="onVigilanteSeguro()" style="border-width:2px"><option value="">—</option><option>Sim</option><option>Não</option></select></div>
     <div class="fgroup"><label>Responsável</label><input id="se-resp" placeholder="Quem solicitou"></div>
   </div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Sinistro</div><div class="fg-grid">
@@ -1491,7 +1491,7 @@ function saveRecord(type){
   }
   else if(type==='segware'){if(!gi('sg-produto')||!gi('sg-per'))return alert('Preencha Produto e Período.');const qtd=gn('sg-qtd'),unit=gn('sg-unit');upsert('segware',{produto:gi('sg-produto'),qtd,unit,total:qtd*unit,period:gi('sg-per')});closeModal('segware');renderSegware();renderDash();}
   else if(type==='selbit'){if(!gi('sl-id')||!gi('sl-desc')||!gi('sl-per'))return alert('Preencha ID, Descrição e Período.');const impPB=gn('sl-imp-pb'),impColor=gn('sl-imp-color'),valor=gn('sl-valor'),vlPB=gn('sl-vl-pb'),vlColor=gn('sl-vl-color'),totPB=impPB*vlPB,totColor=impColor*vlColor,total=valor+totPB+totColor;const rec={sid:gi('sl-id'),desc:gi('sl-desc'),local:gi('sl-local'),period:gi('sl-per'),impPB,impColor,valor,vlPB,vlColor,totPB,totColor,total};let final;if(_ed.selbit){const i=DB.selbit.findIndex(x=>x.id===_ed.selbit);if(i>=0){DB.selbit[i]={...DB.selbit[i],...rec};final=DB.selbit[i];}}else{final={id:uid(),...rec};DB.selbit.push(final);}save();updateBadges();if(final)saveToSupabase('selbit',final);closeModal('selbit');renderSelbit();renderDash();}
-  else if(type==='seguros'){if(!gi('se-data')||!gi('se-cliente')||!gi('se-filial'))return alert('Preencha Data, Cliente e Filial.');const _svc=gi('se-servico');upsert('seguros',{data:gi('se-data'),cliente:gi('se-cliente'),conta:gi('se-conta'),filial:_normFilial(gi('se-filial')),servico:_svc,vigilante:(_svc==='Portaria'?gi('se-vigilante'):''),resp:gi('se-resp'),sinistro:gi('se-sinistro'),descricao:gi('se-desc'),status:gi('se-status'),data_resp:gi('se-dataresp'),indeniz:gi('se-indeniz'),valor:gn('se-valor'),data_pag:gi('se-datapag'),obs:gi('se-obs')});closeModal('seguros');renderSeguros();updateBadges();renderDash();}
+  else if(type==='seguros'){if(!gi('se-data')||!gi('se-cliente')||!gi('se-filial'))return alert('Preencha Data, Cliente e Filial.');const _svc=gi('se-servico');upsert('seguros',{data:gi('se-data'),cliente:gi('se-cliente'),conta:gi('se-conta'),filial:_normFilial(gi('se-filial')),servico:_svc,vigilante:((_svc==='Portaria'||_svc==='Alarme')?gi('se-vigilante'):''),resp:gi('se-resp'),sinistro:gi('se-sinistro'),descricao:gi('se-desc'),status:gi('se-status'),data_resp:gi('se-dataresp'),indeniz:gi('se-indeniz'),valor:gn('se-valor'),data_pag:gi('se-datapag'),obs:gi('se-obs')});closeModal('seguros');renderSeguros();updateBadges();renderDash();}
 }
 
 function upsert(t,rec){
@@ -2488,8 +2488,19 @@ function onServicoSeguro(){
   const svc=gi('se-servico');
   const wrap=document.getElementById('se-vigilante-wrap');
   if(wrap){
-    if(svc==='Portaria'){wrap.style.display='';}
+    if(svc==='Portaria'||svc==='Alarme'){wrap.style.display='';}
     else{wrap.style.display='none';const v=document.getElementById('se-vigilante');if(v)v.value='';}
+  }
+  onVigilanteSeguro();
+}
+function onVigilanteSeguro(){
+  const el=document.getElementById('se-vigilante');if(!el)return;
+  if(el.value==='Sim'){
+    el.style.borderColor='var(--green)';el.style.background='var(--green-l)';el.style.color='var(--green-t)';el.style.fontWeight='800';
+  }else if(el.value==='Não'){
+    el.style.borderColor='var(--red)';el.style.background='var(--red-l)';el.style.color='var(--red-t)';el.style.fontWeight='700';
+  }else{
+    el.style.borderColor='var(--border)';el.style.background='';el.style.color='';el.style.fontWeight='';
   }
 }
 function updateStatusColorSeg(){
@@ -2515,7 +2526,7 @@ function renderSeguros(){
     <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSeguros('${r.id}')" title="Ver detalhes">🔍 ${r.cliente||'—'}</td>
     <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${r.conta||'—'}</td>
     <td><span class="badge bg-blue">${r.filial||'—'}</span></td>
-    <td style="font-size:12px">${r.servico||'—'}</td>
+    <td style="font-size:12px">${r.servico||'—'}${r.vigilante==='Sim'?' <span title="Vigilante da seguradora solicitado" style="color:var(--green);font-weight:800">🛡️</span>':''}</td>
     <td style="font-size:12px;color:var(--text3)">${r.sinistro||'—'}</td>
     <td><span class="badge ${_segStatusBadge(r.status)}">${r.status||'—'}</span></td>
     <td>${r.indeniz?`<span class="badge ${_segIndBadge(r.indeniz)}">${r.indeniz}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
@@ -2539,6 +2550,10 @@ function renderSegurosResumo(){
   const SERVICOS=['Alarme','Portaria'];
   const STATUS=['Aberta','Em Análise','Documentação Pendente','Aprovada','Negada','Paga'];
   const IND=['Sim','Não','Parcial'];
+  // Vigilantes da seguradora solicitados
+  const vigTotal=all.filter(r=>r.vigilante==='Sim').length;
+  const vigPorServico=SERVICOS.map(s=>[s,all.filter(r=>r.servico===s&&r.vigilante==='Sim').length]);
+  const vigRows=[...vigPorServico];const vigTot=['Total',vigTotal];vigTot._bold=true;vigRows.push(vigTot);
 
   const stat=(num,lbl,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:22px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${lbl}</div></div>`;
 
@@ -2576,21 +2591,24 @@ function renderSegurosResumo(){
         ${stat(recParc,'Indenizações Parciais','var(--amber)')}
         ${stat(recNao,'Indenizações Não Recebidas','var(--red)')}
         ${stat(valTotal>0?fmt(valTotal):'—','Valor Total Indenizado','var(--green)')}
+        ${stat('🛡️ '+vigTotal,'Vigilantes Solicitados','var(--cyan-t)')}
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
         ${tbl('Detalhamento por Serviço',['Serviço','Qtde','Valor Indenizado'],svcRows,'var(--blue)')}
         ${tbl('Solicitações por Status',['Status','Qtde'],stRows,'var(--purple-t)')}
         ${tbl('Indenização Recebida',['Status','Qtde'],indRows,'var(--green)')}
+        ${tbl('🛡️ Vigilantes por Serviço',['Serviço','Solicitados'],vigRows,'var(--cyan-t)')}
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px">
         ${_segChartBox('Valor Indenizado por Serviço','seg-ch-valserv')}
         ${_segChartBox('Qtde de Solicitações por Serviço','seg-ch-qtdserv')}
         ${_segChartBox('Solicitações por Status','seg-ch-status',220)}
         ${_segChartBox('Indenização Recebida','seg-ch-indeniz')}
+        ${_segChartBox('🛡️ Vigilantes por Serviço','seg-ch-vigilante')}
       </div>
     </div>`;
   // desenha gráficos após o DOM ser atualizado
-  setTimeout(()=>_segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}),30);
+  setTimeout(()=>_segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc,vigPorServico}),30);
 }
 
 function _segChartBox(title,id,h){
@@ -2600,7 +2618,7 @@ function _segChartBox(title,id,h){
   </div>`;
 }
 
-function _segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}){
+function _segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc,vigPorServico}){
   if(typeof Chart==='undefined')return;
   const C=COLS.seguros, grid=isDark()?'#1e293b':'#e5e7eb', txt=isDark()?'#94a3b8':'#64748b';
   const baseOpts=extra=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:txt,font:{size:10}}},y:{beginAtZero:true,grid:{color:grid},ticks:{color:txt,font:{size:10},precision:0}}},...extra});
@@ -2624,6 +2642,10 @@ function _segurosCharts({SERVICOS,STATUS,IND,all,recSim,recNao,recParc}){
   const indCols=['#16a34a','#dc2626','#d97706'];
   const hasInd=indData.some(v=>v>0);
   mk('seg-ch-indeniz',{type:'doughnut',data:{labels:IND,datasets:[{data:hasInd?indData:[1,1,1],backgroundColor:indCols.map(c=>c+'dd'),borderColor:isDark()?'#0f1629':'#fff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:txt,font:{size:11},boxWidth:12,padding:8}},tooltip:{enabled:hasInd}}}});
+
+  // 5) Vigilantes solicitados por serviço (barras)
+  const vigData=(vigPorServico||SERVICOS.map(s=>[s,0])).map(x=>x[1]);
+  mk('seg-ch-vigilante',{type:'bar',data:{labels:SERVICOS,datasets:[{data:vigData,backgroundColor:'#0891b2cc',borderColor:'#0891b2',borderWidth:1,borderRadius:4}]},options:baseOpts()});
 }
 
 function verSeguros(id){
@@ -2638,7 +2660,7 @@ function verSeguros(id){
       _verCard('Conta',r.conta||'—')+
       _verCard('Filial',`<span class="badge bg-blue">${r.filial||'—'}</span>`)+
       _verCard('Serviço',r.servico||'—')+
-      (r.servico==='Portaria'?_verCard('🛡️ Vigilante Seguradora',r.vigilante?`<span class="badge ${r.vigilante==='Sim'?'bg-green':'bg-red'}">${r.vigilante}</span>`:'—'):'')+
+      ((r.servico==='Portaria'||r.servico==='Alarme')?_verCard('🛡️ Vigilante Seguradora',r.vigilante?`<span class="badge ${r.vigilante==='Sim'?'bg-green':'bg-red'}">${r.vigilante}</span>`:'—'):'')+
       _verCard('Responsável',r.resp||'—')+
       _verCard('Status',`<span class="badge ${_segStatusBadge(r.status)}">${r.status||'—'}</span>`)
     )}
