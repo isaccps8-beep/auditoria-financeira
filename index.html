@@ -381,6 +381,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
     <div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('torre')">↓ Exportar ▾</button><div class="export-menu" id="em-torre"><div class="export-item" onclick="exportTabCSV('torre')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('torre')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('torre')">🗂 JSON</div></div></div>
   </div>
   <div id="alerts-torre" class="alerts" style="margin-bottom:12px"></div>
+  <div id="grat-lucro-torre" style="margin-bottom:14px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Filial</th><th>Custo Torre</th><th>Torres</th><th>Câmeras</th><th>Intel.</th><th>Tipo Intel.</th><th>Contrato</th><th>Val.Cliente</th><th>Tipo</th><th>Instalação</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-torre"></tbody></table><div class="tbl-foot" id="tf-torre"></div></div>
 </div>
 
@@ -398,6 +399,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="pg-hdr"><div><div class="pg-title">Armários · Locação</div></div><div class="flex" style="gap:8px"><button class="btn btn-estoque" onclick="openEstoqueArmario()">📦 Estoque de Armários</button><button class="btn btn-primary" onclick="openModal('armario')">+ Novo Registro</button></div></div>
   <div class="filters"><div class="fg"><label>Pesquisar</label><input type="text" id="f-arm" placeholder="Condomínio…" oninput="renderArmario()" style="min-width:160px"></div><div class="fg"><label>Filial</label><select id="f-arm-fil" onchange="renderArmario()"><option value="">Todas</option></select></div><div class="fg"><label>Fornecedor</label><select id="f-arm-forn" onchange="renderArmario()"><option value="">Todos</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fg"><label>Contrato</label><select id="f-arm-cont" onchange="renderArmario()"><option value="">Todos</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div><div class="fg"><label>Status</label><select id="f-arm-st" onchange="renderArmario()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div><div class="fg"><label>Gratificado</label><select id="f-arm-grat" onchange="renderArmario()"><option value="">Todos</option><option value="sim">Sim</option><option value="nao">Não</option></select></div><div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('armario')">↓ Exportar ▾</button><div class="export-menu" id="em-armario"><div class="export-item" onclick="exportTabCSV('armario')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('armario')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('armario')">🗂 JSON</div></div></div></div>
   <div id="alerts-armario" class="alerts" style="margin-bottom:12px"></div>
+  <div id="grat-lucro-armario" style="margin-bottom:14px"></div>
   <div class="tbl-wrap"><table><thead id="thead-armario"><tr>
         <th style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" id="chk-all-armario" onchange="if(typeof selAllTab!=='undefined')selAllTab('armario',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></th>
         <th class="sortable sticky-col" onclick="setSort('armario','cond')">Condomínio</th>
@@ -2372,6 +2374,44 @@ function clearBulk(tab){_selected[tab].clear();updateBulkBar(tab);document.query
 function bulkDelete(tab){const ids=[..._selected[tab]];if(!ids.length)return;if(!confirm('Excluir '+ids.length+' registro(s) permanentemente?'))return;ids.forEach(id=>{DB[tab]=DB[tab].filter(x=>x.id!==id);sbDel(tab,id);});_selected[tab].clear();save();updateBadges();updateBulkBar(tab);({torre:renderTorre,terc:()=>{renderTerc();},armario:renderArmario,segware:renderSegware,selbit:renderSelbit,seguros:renderSeguros})[tab]?.();renderDash();showToast(ids.length+' registro(s) excluído(s)','ok');}
 function selAllTab(tab,cb){document.querySelectorAll('.row-check[data-tab="'+tab+'"]').forEach(c=>{c.checked=cb.checked;if(cb.checked)_selected[tab].add(c.dataset.id);else _selected[tab].delete(c.dataset.id);});updateBulkBar(tab);}
 
+function renderGratLucro(tipo){
+  const el=document.getElementById('grat-lucro-'+tipo);if(!el)return;
+  let custoGrat=0, receita=0, qtdGrat=0;
+  if(tipo==='torre'){
+    // Custo das gratificadas: gratificadas × custo (ativas + pendentes)
+    DB.torre.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
+      const g=Number(r.gratificadas)||0;
+      if(g>0){custoGrat+=g*(Number(r.custo)||0);qtdGrat+=g;}
+    });
+    // Receita: valor pago pelos clientes (ativas)
+    receita=DB.torre.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+  }else{
+    // Armário: custo das gratificadas = valor fornecedor das unidades gratificadas (ativas)
+    DB.armario.filter(r=>r.status==='ativo').forEach(r=>{
+      if((Number(r.gratificadas)||0)>0){custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
+    });
+    receita=DB.armario.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+  }
+  const saldo=receita-custoGrat;
+  const pos=saldo>=0;
+  const cRes=pos?'var(--green)':'var(--red)';
+  const lbl=tipo==='torre'?'torres':'armários';
+  const stat=(num,txt,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:20px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${txt}</div></div>`;
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px">
+      <div style="font-size:13px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">${pos?'📈':'📉'} Gratificações × Receita <span style="font-weight:600;color:var(--text3);text-transform:none">— ${qtdGrat} ${lbl} gratificad${tipo==='torre'?'as':'os'}</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${stat(fmt(custoGrat),'Custo das Gratificadas','var(--amber)')}
+        ${stat(fmt(receita),'Receita dos Clientes','var(--blue)')}
+        ${stat((pos?'':'−')+fmt(Math.abs(saldo)),pos?'Saldo (Lucro)':'Saldo (Prejuízo)',cRes)}
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5">
+        ${pos
+          ? '✓ A receita dos clientes cobre o custo das cortesias com folga de '+fmt(saldo)+'.'
+          : '⚠ O custo das cortesias supera a receita em '+fmt(Math.abs(saldo))+'.'}
+      </div>
+    </div>`;
+}
 function renderTorre(){
   const selFil=document.getElementById('f-torre-fil');
   if(selFil){
@@ -2440,6 +2480,7 @@ function renderTorre(){
     <div class="tf-item"><span>Val. Cobrado Clientes</span><strong style="color:var(--green)">${fmt(sum(at,'vcliente'))}</strong></div>
   `;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
+  renderGratLucro('torre');
 }
 
 
@@ -2480,7 +2521,7 @@ function renderArmario(){
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verArmario('${r.id}')">👁</button>
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('armario','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('armario','${r.id}','${(r.cond||'').replace(/'/g,"\\'")}')">✕</button>
-      </div></td></tr>`).join(''):emptyR(12);const at=DB.armario.filter(r=>r.status==='ativo');const totalDisp=Object.values(EST.armario).reduce((s,f)=>s+(f.disponivel||0),0);document.getElementById('tf-armario').innerHTML=`<div class="tf-item"><span>Val.Clientes</span><strong style="color:var(--blue)">${fmt(sum(at,'vcliente'))}</strong></div><div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div><div class="tf-item"><span>Val.Fornec.</span><strong style="color:var(--orange)">${fmt(sum(at,'vforn'))}</strong></div><div class="tf-item"><span>Total</span><strong>${fmt(sum(at,'vcliente'))}</strong></div>`;document.getElementById('alerts-armario').innerHTML=DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length?`<div class="al al-amber">⚠ ${DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length} armário(s) inativo(s) com cobrança.</div>`:'';}
+      </div></td></tr>`).join(''):emptyR(12);const at=DB.armario.filter(r=>r.status==='ativo');const totalDisp=Object.values(EST.armario).reduce((s,f)=>s+(f.disponivel||0),0);document.getElementById('tf-armario').innerHTML=`<div class="tf-item"><span>Val.Clientes</span><strong style="color:var(--blue)">${fmt(sum(at,'vcliente'))}</strong></div><div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div><div class="tf-item"><span>Val.Fornec.</span><strong style="color:var(--orange)">${fmt(sum(at,'vforn'))}</strong></div><div class="tf-item"><span>Total</span><strong>${fmt(sum(at,'vcliente'))}</strong></div>`;document.getElementById('alerts-armario').innerHTML=DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length?`<div class="al al-amber">⚠ ${DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length} armário(s) inativo(s) com cobrança.</div>`:'';renderGratLucro('armario');}
 
 function renderSegware(){const fq=gi('f-seg').toLowerCase(),fper=gi('f-seg-per');const rows=DB.segware.filter(r=>(!fq||(r.produto||'').toLowerCase().includes(fq))&&(!fper||r.period===fper));document.getElementById('tb-segware').innerHTML=rows.length?rows.map(r=>`<tr><td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSegware('${r.id}')" title="Ver detalhes">🔍 ${r.produto}</td><td style="font-family:var(--mono)">${r.qtd}</td><td style="font-family:var(--mono)">${fmt(r.unit)}</td><td style="color:var(--accent);font-weight:800;font-family:var(--mono)">${fmt(r.total)}</td><td style="color:var(--text3);font-size:12px">${fmtPeriod(r.period)}</td><td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verSegware('${r.id}')">👁</button>
