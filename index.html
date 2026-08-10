@@ -2061,13 +2061,18 @@ function renderEstoqueFiliais(tipo){
       if(!f) return;
       instPF[f]=(instPF[f]||0)+(Number(r.qtd)||0);
       instCLI[f]=(instCLI[f]||0)+1;
-      if((Number(r.gratificadas)||0)>0) gratPF[f]=(gratPF[f]||0)+(Number(r.gratificadas)||0);
     });
     DB.torre.filter(r=>r.status==='pendente').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
       if(!f) return;
       pendPF[f]=(pendPF[f]||0)+(Number(r.qtd)||0);
       pendCLI[f]=(pendCLI[f]||0)+1;
+    });
+    // Gratificadas: conta ativas E pendentes (só não conta inativas)
+    DB.torre.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
+      const f=_normFilial((r.filial||'').trim());
+      if(!f) return;
+      if((Number(r.gratificadas)||0)>0) gratPF[f]=(gratPF[f]||0)+(Number(r.gratificadas)||0);
     });
     DB.torre.filter(r=>r.status==='inativo').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
