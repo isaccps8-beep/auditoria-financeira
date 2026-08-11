@@ -125,6 +125,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 .tf-item{display:flex;align-items:center;gap:6px;font-size:12px}
 .tf-item span{color:var(--text3);font-size:11px;font-weight:700}.tf-item strong{color:var(--accent);font-weight:800;font-family:var(--mono)}
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:800;white-space:nowrap}
+.badge-status{display:inline-flex;align-items:center;padding:5px 12px;border-radius:7px;font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;border-width:2px;border-style:solid}
 .bg-green{background:var(--green-l);color:var(--green-t)}.bg-red{background:var(--red-l);color:var(--red-t)}.bg-amber{background:var(--amber-l);color:var(--amber-t)}.bg-blue{background:var(--blue-l);color:var(--blue-t)}.bg-purple{background:var(--purple-l);color:var(--purple-t)}.bg-cyan{background:var(--cyan-l);color:var(--cyan-t)}
 .overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
 .overlay.open{display:flex}
@@ -381,13 +382,13 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="filters">
     <div class="fg"><label>Pesquisar</label><input type="text" id="f-torre" placeholder="Cliente…" oninput="renderTorre()" style="min-width:140px"></div>
     <div class="fg"><label>Filial</label><select id="f-torre-fil" onchange="renderTorre()"><option value="">Todas</option></select></div>
-    <div class="fg"><label>Status</label><select id="f-torre-st" onchange="renderTorre()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div>
+    <div class="fg"><label>Status</label><select id="f-torre-st" onchange="renderTorre()"><option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option><option value="autorizada">Autorizada</option><option value="em_autorizacao">Em Autorização</option><option value="avaliar">Avaliar</option><option value="segundo_plano">Segundo Plano</option></select></div>
     <div class="fg"><label>Contrato</label><select id="f-torre-cont" onchange="renderTorre()"><option value="">Todos</option><option value="Sim">Sim</option><option value="Não">Não</option></select></div><div class="fg"><label>Tipo</label><select id="f-torre-tipo" onchange="renderTorre()"><option value="">Todos</option><option value="Portaria">Portaria</option><option value="Alarme">Alarme</option></select></div><div class="fg"><label>Gratificado</label><select id="f-torre-grat" onchange="renderTorre()"><option value="">Todos</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
     <div class="export-wrap"><button class="btn btn-ghost" onclick="toggleExportMenuTab('torre')">↓ Exportar ▾</button><div class="export-menu" id="em-torre"><div class="export-item" onclick="exportTabCSV('torre')">📋 CSV</div><div class="export-item" onclick="exportTabXLSX('torre')">📊 Excel</div><div class="export-item" onclick="exportTabJSON('torre')">🗂 JSON</div></div></div>
   </div>
   <div id="alerts-torre" class="alerts" style="margin-bottom:12px"></div>
   <div id="grat-lucro-torre" style="margin-bottom:14px"></div>
-  <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Filial</th><th>Custo Torre</th><th>Torres</th><th>Câmeras</th><th>Intel.</th><th>Tipo Intel.</th><th>Contrato</th><th>Val.Cliente</th><th>Tipo</th><th>Instalação</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-torre"></tbody></table><div class="tbl-foot" id="tf-torre"></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Filial</th><th>Custo Torre</th><th>Torres</th><th>Câmeras</th><th>Intel.</th><th>Tipo Intel.</th><th>Contrato</th><th>Val.Cliente</th><th>Tipo</th><th>Instalação</th><th style="text-align:center">Status</th><th>Ações</th></tr></thead><tbody id="tb-torre"></tbody></table><div class="tbl-foot" id="tf-torre"></div></div>
   </div>
   <div id="torre-sub-amort" style="display:none">
     <div id="payback-torre"></div>
@@ -582,7 +583,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
         <div class="fg-grid">
           <div class="fgroup" style="grid-column:1/-1"><label>Cliente *</label><input id="t-cliente" placeholder="Nome do cliente"></div>
           <div class="fgroup"><label>Filial</label><select id="t-filial"></select></div>
-          <div class="fgroup"><label>Status</label><select id="t-status" onchange="updateStatusColor('t-status')"><option value="ativo">Ativo</option><option value="pendente">Pendente</option><option value="inativo">Inativo</option></select></div>
+          <div class="fgroup"><label>Status</label><select id="t-status" onchange="updateStatusColor('t-status')"><option value="ativo">Ativo</option><option value="pendente">Pendente</option><option value="inativo">Inativo</option><option value="autorizada">Autorizada</option><option value="em_autorizacao">Em Autorização</option><option value="avaliar">Avaliar</option><option value="segundo_plano">Segundo Plano</option></select></div>
           <div class="fgroup"><label>Tipo</label><select id="t-tipo"><option value="">— Selecione —</option><option value="Portaria">Portaria</option><option value="Alarme">Alarme</option></select></div>
           <div class="fgroup"><label>Contrato</label><select id="t-contrato"><option value="Não">Não</option><option value="Sim">Sim</option></select></div>
           <div class="fgroup"><label>Data Instalação</label><input type="date" id="t-data"></div>
@@ -1002,6 +1003,22 @@ const prevM=ym=>{const[y,m]=ym.split('-').map(Number);return m===1?`${y-1}-12`:`
 const prevY=ym=>{const[y,m]=ym.split('-');return`${Number(y)-1}-${m}`};
 const pct=(c,p)=>p===0?null:(c-p)/p*100;
 const statusBadge=s=>s==='ativo'?'bg-green':s==='pendente'?'bg-amber':'bg-red';
+// Rótulos e cores dos status estendidos da Torre (não contam estoque)
+const STATUS_LABEL={ativo:'Ativo',pendente:'Pendente',inativo:'Inativo',autorizada:'Autorizada',em_autorizacao:'Em Autorização',avaliar:'Avaliar',segundo_plano:'Segundo Plano'};
+const STATUS_STYLE={
+  ativo:{bg:'#f0fdf4',b:'#16a34a',c:'#14532d'},
+  pendente:{bg:'#fffbeb',b:'#d97706',c:'#78350f'},
+  inativo:{bg:'#fef2f2',b:'#dc2626',c:'#7f1d1d'},
+  autorizada:{bg:'#e0f2fe',b:'#38bdf8',c:'#0369a1'},
+  em_autorizacao:{bg:'#fefce8',b:'#facc15',c:'#a16207'},
+  avaliar:{bg:'#f1f5f9',b:'#64748b',c:'#334155'},
+  segundo_plano:{bg:'#fce7ec',b:'#9f1239',c:'#9f1239'}
+};
+function statusBadgeHTML(s){
+  const lbl=STATUS_LABEL[s]||s;
+  const st=STATUS_STYLE[s]||{bg:'var(--surface3)',b:'var(--border2)',c:'var(--text2)'};
+  return `<span class="badge-status" style="background:${st.bg};border-color:${st.b};color:${st.c}">${lbl}</span>`;
+}
 
 // ══════════════════════════════════════════
 // TOAST
@@ -1414,7 +1431,11 @@ function updateStatusColor(id){
   const map={
     ativo:   {bg:'var(--green-l)', b:'var(--green)',  c:'var(--green-t)'},
     inativo: {bg:'var(--red-l)',   b:'var(--red)',    c:'var(--red-t)'},
-    pendente:{bg:'var(--amber-l)', b:'var(--amber)',  c:'var(--amber-t)'}
+    pendente:{bg:'var(--amber-l)', b:'var(--amber)',  c:'var(--amber-t)'},
+    autorizada:     {bg:'#e0f2fe', b:'#38bdf8', c:'#0369a1'},
+    em_autorizacao: {bg:'#fefce8', b:'#facc15', c:'#a16207'},
+    avaliar:        {bg:'#f1f5f9', b:'#64748b', c:'#334155'},
+    segundo_plano:  {bg:'#fce7ec', b:'#9f1239', c:'#9f1239'}
   };
   const s=map[el.value]||{bg:'var(--surface)',b:'var(--border)',c:'var(--text)'};
   el.style.background=s.bg;
@@ -1647,8 +1668,7 @@ function verTorre(id){
   // Header
   document.getElementById('ver-torre-title').textContent=r.cliente||'—';
   document.getElementById('ver-torre-sub').textContent=(r.filial||'—')+' · '+(r.tipo||'Torre');
-  document.getElementById('ver-torre-status-badge').className='badge '+statusBadge(r.status);
-  document.getElementById('ver-torre-status-badge').textContent=r.status;
+  {const _sb=document.getElementById('ver-torre-status-badge');const _st=STATUS_STYLE[r.status]||{bg:'var(--surface3)',b:'var(--border2)',c:'var(--text2)'};_sb.className='badge-status';_sb.style.background=_st.bg;_sb.style.borderColor=_st.b;_sb.style.color=_st.c;_sb.textContent=STATUS_LABEL[r.status]||r.status;}
   document.getElementById('ver-torre-icon').textContent=r.tipo==='Alarme'?'🚨':'📡';
   document.getElementById('ver-torre-edit-btn').setAttribute('onclick',"closeModal('ver-torre');openModal('torre','"+id+"')");
 
@@ -2537,7 +2557,7 @@ function renderTorre(){
       <td style="font-family:var(--mono);color:var(--green);font-weight:800">${fmt(r.vcliente||0)}</td>
       <td>${r.tipo?`<span class="badge bg-cyan">${r.tipo}</span>`:'<span style="color:var(--text3)">—</span>'}</td>
       <td style="color:var(--text3);font-size:12px;white-space:nowrap">${fmtDate(r.data)}</td>
-      <td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td>
+      <td style="text-align:center">${statusBadgeHTML(r.status)}</td>
       <td>
         <div style="display:flex;gap:4px">
           <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verTorre('${r.id}')" title="Ver detalhes">👁</button>
