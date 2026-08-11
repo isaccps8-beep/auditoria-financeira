@@ -620,8 +620,8 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   <div class="sec"><div class="sec-lbl" style="color:var(--accent)">Identificação</div><div class="fg-grid"><div class="fgroup"><label>Condomínio *</label><input id="a-cond" placeholder="Nome"></div><div class="fgroup"><label>Filial</label><select id="a-filial"><option value="">— Selecione —</option></select></div><div class="fgroup"><label>Modelo</label><input id="a-modelo" placeholder="Padrão"></div><div class="fgroup"><label>Fornecedor *</label><select id="a-forn"><option value="">— Selecione —</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fgroup"><label>Aquisição</label><select id="a-aquis"><option value="">— Selecione —</option><option>Exposec</option><option>Pós Exposec</option><option>Normal</option></select></div><div class="fgroup"><label>Status</label><select id="a-status" onchange="updateStatusColor('a-status')"><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div></div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--blue)">Contrato</div><div class="fg-grid"><div class="fgroup"><label>Qtd. Portas</label><input type="number" id="a-portas" min="0" placeholder="0" oninput="calcA()"></div>
   <div class="fgroup"><label style="color:var(--amber)">⭐ Gratificado?</label><select id="a-gratificadas" oninput="calcA()" onchange="calcA()" style="border-color:var(--amber);border-width:2px"><option value="0">Não</option><option value="1">Sim</option></select></div>
-  <div class="fgroup" style="grid-column:1/-1"><small id="a-cobrados-info" style="font-size:12px"></small></div><div class="fgroup"><label>Nº Pedido</label><input id="a-pedido" placeholder="PED-001"></div><div class="fgroup"><label>Nº NF</label><input id="a-nf" placeholder="NF-0001"></div><div class="fgroup"><label>Data Instalação</label><input type="date" id="a-inst"></div><div class="fgroup"><label>Data Saída</label><input type="date" id="a-saida"></div><div class="fgroup"><label>Aditivo (meses)</label><input type="number" id="a-aditivo" min="0" placeholder="0"></div><div class="fgroup"><label>Carência (dias)</label><input type="number" id="a-carencia" min="0" placeholder="0"></div><div class="fgroup"><label>Prev. Pagamento</label><input type="date" id="a-prevpag"></div></div></div>
-  <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid"><div class="fgroup"><label>Frete (R$)</label><input type="number" id="a-frete" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Gestão (R$)</label><input type="number" id="a-gestao" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Val. Cliente (R$) *</label><input type="number" id="a-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcA()"></div><div class="fgroup"><label>Mensalidade (R$)</label><input type="number" id="a-mens" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Val. Fornecedor (R$)</label><input type="number" id="a-vforn" min="0" step=".01" placeholder="0,00"></div></div></div>
+  <div class="fgroup" style="grid-column:1/-1"><small id="a-cobrados-info" style="font-size:12px"></small></div><div class="fgroup"><label>Nº Pedido</label><input id="a-pedido" placeholder="PED-001"></div><div class="fgroup"><label>Nº NF</label><input id="a-nf" placeholder="NF-0001"></div><div class="fgroup"><label>Data Instalação</label><input type="date" id="a-inst"></div><div class="fgroup"><label>Data de Retirada</label><input type="date" id="a-saida"></div><div class="fgroup"><label>Aditivo (meses)</label><input type="number" id="a-aditivo" min="0" placeholder="0"></div><div class="fgroup"><label>Carência (dias)</label><input type="number" id="a-carencia" min="0" placeholder="0"></div></div></div>
+  <div class="sec"><div class="sec-lbl" style="color:var(--orange)">Valores</div><div class="fg-grid"><div class="fgroup"><label>Val. Cliente (R$) *</label><input type="number" id="a-vcliente" min="0" step=".01" placeholder="0,00" oninput="calcA()"></div><div class="fgroup"><label>Mensalidade (R$)</label><input type="number" id="a-mens" min="0" step=".01" placeholder="0,00"></div><div class="fgroup"><label>Val. Fornecedor (R$)</label><input type="number" id="a-vforn" min="0" step=".01" placeholder="0,00"></div></div></div>
   <div class="calc-panel"><div class="sec-lbl" style="color:var(--text2)">Observações</div><div class="fg-grid" style="grid-template-columns:1fr"><div class="fgroup"><label>Obs.</label><input id="a-obs" placeholder="Anotações…"></div></div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--purple)">Localização</div><div class="fg-grid" style="grid-template-columns:1fr"><div class="fgroup"><label>Endereço</label><input id="a-endereco" placeholder="Ex: Rua dos Armários, 456"></div></div></div>
 </div><div class="modal-ftr"><button class="btn btn-ghost" onclick="closeModal('armario')">Cancelar</button><button class="btn btn-primary" onclick="saveRecord('armario')">💾 Salvar</button></div></div></div>
@@ -1360,7 +1360,7 @@ const FIELDS={
 
   torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
   terc:[['e-cod','cod'],['e-emp','empresa'],['e-qtd','qtd'],['e-unit','unit'],['e-per','period']],
-  armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-prevpag','prevpag'],['a-frete','frete'],['a-gestao','gestao'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
+  armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
   segware:[['sg-produto','produto'],['sg-qtd','qtd'],['sg-unit','unit'],['sg-per','period']],
   selbit:[['sl-id','sid'],['sl-desc','desc'],['sl-local','local'],['sl-per','period'],['sl-imp-pb','impPB'],['sl-imp-color','impColor'],['sl-valor','valor'],['sl-vl-pb','vlPB'],['sl-vl-color','vlColor']],
   seguros:[['se-data','data'],['se-cliente','cliente'],['se-conta','conta'],['se-filial','filial'],['se-servico','servico'],['se-vigilante','vigilante'],['se-resp','resp'],['se-sinistro','sinistro'],['se-desc','descricao'],['se-status','status'],['se-dataresp','data_resp'],['se-indeniz','indeniz'],['se-valor','valor'],['se-datapag','data_pag'],['se-obs','obs']]
@@ -1478,7 +1478,7 @@ function saveRecord(type){
     }
   }
   else if(type==='terc'){if(!gi('e-cod')||!gi('e-emp')||!gi('e-per'))return alert('Preencha Código, Empresa e Período.');const qtd=gn('e-qtd'),unit=gn('e-unit');const sim=DB.terc.filter(r=>r.empresa===gi('e-emp')&&r.id!==_ed.terc);const avg=sim.length?sim.reduce((a,b)=>a+(b.unit||0),0)/sim.length:0;upsert('terc',{cod:gi('e-cod'),empresa:gi('e-emp'),qtd,unit,total:qtd*unit,period:gi('e-per'),warn:avg>0&&Math.abs(unit-avg)/avg>0.5});closeModal('terc');renderTerc();renderTercPivot();renderDash();}
-  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');const gratA=(gn('a-gratificadas')||0)>0?1:0;upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),aquisicao:gi('a-aquis'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),prevpag:gi('a-prevpag'),frete:gn('a-frete'),gestao:gn('a-gestao'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:(gratA?0:vcliente),gratificadas:gratA});closeModal('armario');
+  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');const gratA=(gn('a-gratificadas')||0)>0?1:0;upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),aquisicao:gi('a-aquis'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:(gratA?0:vcliente),gratificadas:gratA});closeModal('armario');
     renderArmario();
     updateBadges();
     renderDash();
@@ -1821,17 +1821,16 @@ function verArmario(id){
     )}
 
     ${_verSection('Contrato')}
-    ${_verGrid('1fr 1fr 1fr 1fr',
+    ${_verGrid('1fr 1fr 1fr',
       _verCard('Nº Pedido',`<span style="font-family:var(--mono);color:var(--accent)">${r.pedido||'—'}</span>`)+
       _verCard('Nº NF',`<span style="font-family:var(--mono)">${r.nf||'—'}</span>`)+
-      _verCard('Aditivo',r.aditivo?r.aditivo+' meses':'—')+
-      _verCard('Prev. Pagamento',fmtDate(r.prevpag))
+      _verCard('Aditivo',r.aditivo?r.aditivo+' meses':'—')
     )}
 
     ${_verSection('Datas')}
     ${_verGrid('1fr 1fr 1fr',
       _verCard('Instalação',fmtDate(r.inst))+
-      _verCard('Saída',fmtDate(r.saida))+
+      _verCard('Retirada',fmtDate(r.saida))+
       _verCard('Carência',r.carencia&&Number(r.carencia)>0?(Number(r.carencia)+' dias'):'—')
     )}
 
@@ -1842,16 +1841,6 @@ function verArmario(id){
     )}
 
     ${_verSection('Financeiro')}
-    <div class="ver-grid" style="grid-template-columns:1fr 1fr;padding-bottom:16px">
-      <div class="ver-money" style="border-color:color-mix(in srgb,var(--cyan) 30%,transparent)">
-        <div class="ver-money-lbl">Frete</div>
-        <div class="ver-money-val" style="color:var(--cyan)">${fmt(r.frete||0)}</div>
-      </div>
-      <div class="ver-money" style="border-color:color-mix(in srgb,var(--teal) 30%,transparent)">
-        <div class="ver-money-lbl">Gestão</div>
-        <div class="ver-money-val" style="color:var(--teal)">${fmt(r.gestao||0)}</div>
-      </div>
-    </div>
     <div class="ver-grid" style="grid-template-columns:1fr 1fr 1fr;padding-bottom:20px">
       <div class="ver-money" style="border-color:color-mix(in srgb,var(--green) 30%,transparent)">
         <div class="ver-money-lbl">Val. Cliente</div>
