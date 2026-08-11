@@ -382,6 +382,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   </div>
   <div id="alerts-torre" class="alerts" style="margin-bottom:12px"></div>
   <div id="grat-lucro-torre" style="margin-bottom:14px"></div>
+  <div id="payback-torre" style="margin-bottom:14px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Filial</th><th>Custo Torre</th><th>Torres</th><th>Câmeras</th><th>Intel.</th><th>Tipo Intel.</th><th>Contrato</th><th>Val.Cliente</th><th>Tipo</th><th>Instalação</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-torre"></tbody></table><div class="tbl-foot" id="tf-torre"></div></div>
 </div>
 
@@ -2391,6 +2392,81 @@ function renderGratLucro(tipo){
       </div>
     </div>`;
 }
+// Meses decorridos entre uma data e hoje (mínimo 0)
+function _mesesDesde(dataStr){
+  if(!dataStr)return 0;
+  const d=new Date(String(dataStr).slice(0,10)+'T00:00:00');
+  if(isNaN(d))return 0;
+  const hoje=new Date();
+  let m=(hoje.getFullYear()-d.getFullYear())*12+(hoje.getMonth()-d.getMonth());
+  if(hoje.getDate()>=d.getDate()) m+=1; // conta o mês corrente se já passou o dia
+  return Math.max(0,m);
+}
+function renderPaybackTorre(){
+  const el=document.getElementById('payback-torre');if(!el)return;
+  const ativas=DB.torre.filter(r=>r.status==='ativo');
+  let custoTotal=0, receitaMensal=0, receitaAcum=0;
+  const detalhe=[];
+  ativas.forEach(r=>{
+    const qtd=Number(r.qtd)||0, custo=Number(r.custo)||0, vcli=Number(r.vcliente)||0;
+    const custoR=qtd*custo;
+    const meses=_mesesDesde(r.data);
+    const acum=vcli*meses;
+    custoTotal+=custoR;
+    receitaMensal+=vcli;
+    receitaAcum+=acum;
+    // payback individual: quantos meses para custo se pagar
+    const pbMeses=vcli>0?Math.ceil(custoR/vcli):null;
+    detalhe.push({cliente:r.cliente||'—',filial:r.filial||'—',custoR,vcli,meses,acum,pbMeses,pago:acum>=custoR&&custoR>0});
+  });
+  const saldo=receitaAcum-custoTotal;
+  const pago=saldo>=0;
+  const pbConsolidado=receitaMensal>0?Math.ceil(custoTotal/receitaMensal):null;
+  const cor=pago?'var(--green)':'var(--amber)';
+  const stat=(num,txt,col)=>`<div style="flex:1;min-width:140px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:19px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${txt}</div></div>`;
+  // progresso de recuperação
+  const pct=custoTotal>0?Math.min(100,Math.round(receitaAcum/custoTotal*100)):0;
+  // tabela por torre
+  const linhas=detalhe.sort((a,b)=>b.custoR-a.custoR).map(d=>`<tr>
+    <td style="padding:7px 14px;font-weight:700">${d.cliente}</td>
+    <td style="padding:7px 14px"><span class="badge bg-blue">${d.filial}</span></td>
+    <td style="padding:7px 14px;text-align:right;font-family:var(--mono);color:var(--orange)">${fmt(d.custoR)}</td>
+    <td style="padding:7px 14px;text-align:right;font-family:var(--mono);color:var(--blue)">${fmt(d.vcli)}</td>
+    <td style="padding:7px 14px;text-align:center;font-family:var(--mono);color:var(--text3)">${d.meses}m</td>
+    <td style="padding:7px 14px;text-align:right;font-family:var(--mono);color:var(--green)">${fmt(d.acum)}</td>
+    <td style="padding:7px 14px;text-align:center">${d.pago?'<span class="badge bg-green">✓ Pago</span>':(d.pbMeses!=null?`<span class="badge bg-amber">${d.pbMeses}m p/ pagar</span>`:'<span style="color:var(--text3)">—</span>')}</td>
+  </tr>`).join('');
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px">
+      <div style="font-size:13px;font-weight:800;color:${cor};text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">⏱️ Amortização · Custo Único × Receita Acumulada</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">O custo da torre é pago uma vez; a receita entra todo mês. Abaixo, quanto já foi recuperado desde a instalação.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        ${stat(fmt(custoTotal),'Custo Único (investido)','var(--orange)')}
+        ${stat(fmt(receitaMensal)+'/mês','Receita Mensal','var(--blue)')}
+        ${stat(fmt(receitaAcum),'Receita Acumulada','var(--green)')}
+        ${stat((pago?'+':'−')+fmt(Math.abs(saldo)),pago?'Saldo (já lucrando)':'Falta recuperar',cor)}
+        ${stat(pbConsolidado!=null?pbConsolidado+' meses':'—','Payback médio','var(--purple-t)')}
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px"><span>Recuperação do investimento</span><span style="font-weight:800;color:${cor}">${pct}%</span></div>
+        <div style="height:10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${cor};transition:width .4s"></div></div>
+      </div>
+      <div style="background:var(--surface);border:2px solid var(--border);border-radius:12px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="border-bottom:2px solid var(--border)">
+            <th style="padding:7px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Cliente</th>
+            <th style="padding:7px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Filial</th>
+            <th style="padding:7px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Custo</th>
+            <th style="padding:7px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Receita/mês</th>
+            <th style="padding:7px 14px;text-align:center;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Meses</th>
+            <th style="padding:7px 14px;text-align:right;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Acumulado</th>
+            <th style="padding:7px 14px;text-align:center;font-size:10px;font-weight:800;text-transform:uppercase;color:var(--text3)">Status</th>
+          </tr></thead>
+          <tbody>${linhas||'<tr><td colspan="7" style="padding:14px;text-align:center;color:var(--text3)">Sem torres ativas</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
 function renderTorre(){
   const selFil=document.getElementById('f-torre-fil');
   if(selFil){
@@ -2460,6 +2536,7 @@ function renderTorre(){
   `;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
   renderGratLucro('torre');
+  renderPaybackTorre();
 }
 
 
