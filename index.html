@@ -373,6 +373,11 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
         <button class="btn btn-danger" onclick="deleteAllTorre()" title="Excluir todos os registros de torres">🗑 Excluir Todos</button>
         <button class="btn btn-primary" onclick="openModal('torre')">+ Novo Registro</button>
       </div></div>
+  <div class="subtabs" style="display:flex;gap:8px;margin-bottom:14px;border-bottom:2px solid var(--border);padding-bottom:0">
+    <button class="subtab-btn active" id="subtab-torre-reg" onclick="switchTorreSub('reg')" style="background:none;border:none;border-bottom:3px solid var(--accent);color:var(--accent);font-weight:800;padding:8px 14px;cursor:pointer;font-size:13px;margin-bottom:-2px">📋 Registros</button>
+    <button class="subtab-btn" id="subtab-torre-amort" onclick="switchTorreSub('amort')" style="background:none;border:none;border-bottom:3px solid transparent;color:var(--text3);font-weight:700;padding:8px 14px;cursor:pointer;font-size:13px;margin-bottom:-2px">⏱️ Amortização</button>
+  </div>
+  <div id="torre-sub-reg">
   <div class="filters">
     <div class="fg"><label>Pesquisar</label><input type="text" id="f-torre" placeholder="Cliente…" oninput="renderTorre()" style="min-width:140px"></div>
     <div class="fg"><label>Filial</label><select id="f-torre-fil" onchange="renderTorre()"><option value="">Todas</option></select></div>
@@ -382,8 +387,11 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
   </div>
   <div id="alerts-torre" class="alerts" style="margin-bottom:12px"></div>
   <div id="grat-lucro-torre" style="margin-bottom:14px"></div>
-  <div id="payback-torre" style="margin-bottom:14px"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Filial</th><th>Custo Torre</th><th>Torres</th><th>Câmeras</th><th>Intel.</th><th>Tipo Intel.</th><th>Contrato</th><th>Val.Cliente</th><th>Tipo</th><th>Instalação</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-torre"></tbody></table><div class="tbl-foot" id="tf-torre"></div></div>
+  </div>
+  <div id="torre-sub-amort" style="display:none">
+    <div id="payback-torre"></div>
+  </div>
 </div>
 
 <!-- TERCEIRIZADAS -->
@@ -406,7 +414,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
         <th class="sortable sticky-col" onclick="setSort('armario','cond')">Condomínio</th>
         <th class="sortable" onclick="setSort('armario','filial')">Filial</th>
         <th class="sortable" onclick="setSort('armario','fornecedor')">Fornecedor</th>
-        <th class="sortable" onclick="setSort('armario','aquisicao')">Aquisição</th>
+        <th class="sortable" onclick="setSort('armario','contrato')">Contrato</th>
         <th class="sortable" onclick="setSort('armario','portas')">Portas</th>
         <th class="sortable" onclick="setSort('armario','inst')">Instalação</th>
         <th class="sortable" onclick="setSort('armario','vcliente')">Val.Cliente</th>
@@ -618,7 +626,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 
 <!-- MODAL ARMÁRIO -->
 <div class="overlay" id="modal-armario"><div class="modal"><div class="modal-hdr"><div><div class="modal-title" id="modal-armario-title">Novo — Armário</div><div class="modal-sub">* obrigatórios</div></div><button class="hbtn-icon" onclick="closeModal('armario')" style="background:var(--red-l);border-color:var(--red);color:var(--red-t)">✕</button></div><div class="modal-body">
-  <div class="sec"><div class="sec-lbl" style="color:var(--accent)">Identificação</div><div class="fg-grid"><div class="fgroup"><label>Condomínio *</label><input id="a-cond" placeholder="Nome"></div><div class="fgroup"><label>Filial</label><select id="a-filial"><option value="">— Selecione —</option></select></div><div class="fgroup"><label>Modelo</label><input id="a-modelo" placeholder="Padrão"></div><div class="fgroup"><label>Fornecedor *</label><select id="a-forn"><option value="">— Selecione —</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fgroup"><label>Aquisição</label><select id="a-aquis"><option value="">— Selecione —</option><option>Exposec</option><option>Pós Exposec</option><option>Normal</option></select></div><div class="fgroup"><label>Status</label><select id="a-status" onchange="updateStatusColor('a-status')"><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div></div></div>
+  <div class="sec"><div class="sec-lbl" style="color:var(--accent)">Identificação</div><div class="fg-grid"><div class="fgroup"><label>Condomínio *</label><input id="a-cond" placeholder="Nome"></div><div class="fgroup"><label>Filial</label><select id="a-filial"><option value="">— Selecione —</option></select></div><div class="fgroup"><label>Modelo</label><input id="a-modelo" placeholder="Padrão"></div><div class="fgroup"><label>Fornecedor *</label><select id="a-forn"><option value="">— Selecione —</option><option>Bicateca</option><option>Meu Loker</option></select></div><div class="fgroup"><label>Contrato</label><select id="a-contrato"><option value="Não">Não</option><option value="Sim">Sim</option></select></div><div class="fgroup"><label>Status</label><select id="a-status" onchange="updateStatusColor('a-status')"><option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="pendente">Pendente</option></select></div></div></div>
   <div class="sec"><div class="sec-lbl" style="color:var(--blue)">Contrato</div><div class="fg-grid"><div class="fgroup"><label>Qtd. Portas</label><input type="number" id="a-portas" min="0" placeholder="0" oninput="calcA()"></div>
   <div class="fgroup"><label style="color:var(--amber)">⭐ Gratificado?</label><select id="a-gratificadas" oninput="calcA()" onchange="calcA()" style="border-color:var(--amber);border-width:2px"><option value="0">Não</option><option value="1">Sim</option></select></div>
   <div class="fgroup" style="grid-column:1/-1"><small id="a-cobrados-info" style="font-size:12px"></small></div><div class="fgroup"><label>Nº Pedido</label><input id="a-pedido" placeholder="PED-001"></div><div class="fgroup"><label>Nº NF</label><input id="a-nf" placeholder="NF-0001"></div><div class="fgroup"><label>Data Instalação</label><input type="date" id="a-inst"></div><div class="fgroup"><label>Data de Retirada</label><input type="date" id="a-saida"></div><div class="fgroup"><label>Aditivo (meses)</label><input type="number" id="a-aditivo" min="0" placeholder="0"></div><div class="fgroup"><label>Carência (dias)</label><input type="number" id="a-carencia" min="0" placeholder="0"></div></div></div>
@@ -1361,7 +1369,7 @@ const FIELDS={
 
   torre:[['t-cliente','cliente'],['t-filial','filial'],['t-status','status'],['t-tipo','tipo'],['t-contrato','contrato'],['t-data','data'],['t-qtd','qtd'],['t-cameras','cameras'],['t-intels','intels'],['t-tipo-intel','tipoIntel'],['t-custo','custo'],['t-vcliente','vcliente'],['t-endereco','endereco'],['t-obs','obs']],
   terc:[['e-cod','cod'],['e-emp','empresa'],['e-qtd','qtd'],['e-unit','unit'],['e-per','period']],
-  armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-aquis','aquisicao'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
+  armario:[['a-cond','cond'],['a-filial','filial'],['a-modelo','modelo'],['a-forn','fornecedor'],['a-contrato','contrato'],['a-status','status'],['a-portas','portas'],['a-pedido','pedido'],['a-nf','nf'],['a-inst','inst'],['a-saida','saida'],['a-aditivo','aditivo'],['a-carencia','carencia'],['a-vcliente','vcliente'],['a-mens','mens'],['a-vforn','vforn'],['a-obs','obs'],['a-endereco','endereco']],
   segware:[['sg-produto','produto'],['sg-qtd','qtd'],['sg-unit','unit'],['sg-per','period']],
   selbit:[['sl-id','sid'],['sl-desc','desc'],['sl-local','local'],['sl-per','period'],['sl-imp-pb','impPB'],['sl-imp-color','impColor'],['sl-valor','valor'],['sl-vl-pb','vlPB'],['sl-vl-color','vlColor']],
   seguros:[['se-data','data'],['se-cliente','cliente'],['se-conta','conta'],['se-filial','filial'],['se-servico','servico'],['se-vigilante','vigilante'],['se-resp','resp'],['se-sinistro','sinistro'],['se-desc','descricao'],['se-status','status'],['se-dataresp','data_resp'],['se-indeniz','indeniz'],['se-valor','valor'],['se-datapag','data_pag'],['se-obs','obs']]
@@ -1371,7 +1379,7 @@ function clearForm(t){
   (FIELDS[t]||[]).forEach(([id])=>{const el=document.getElementById(id);if(el){el.value='';el.style.background='';el.style.borderColor='';el.style.color='';}});
   if(t==='torre'){document.getElementById('t-status').value='ativo';document.getElementById('t-contrato').value='Não';const _gm=document.getElementById('t-grat-modo');if(_gm)_gm.value='nao';const _gq=document.getElementById('t-grat-qtd');if(_gq)_gq.value=0;onGratModoT();updateStatusColor('t-status');calcT();}
   if(t==='terc')document.getElementById('e-per').value=nowM();
-  if(t==='armario'){document.getElementById('a-status').value='ativo';updateStatusColor('a-status');calcA();}
+  if(t==='armario'){document.getElementById('a-status').value='ativo';const _ac=document.getElementById('a-contrato');if(_ac)_ac.value='Não';updateStatusColor('a-status');calcA();}
   if(t==='segware')document.getElementById('sg-per').value=nowM();
   if(t==='selbit')document.getElementById('sl-per').value=nowM();
   if(t==='seguros'){const d=document.getElementById('se-data');if(d)d.value=new Date().toISOString().slice(0,10);const st=document.getElementById('se-status');if(st){st.value='Aberta';updateStatusColorSeg();}const vw=document.getElementById('se-vigilante-wrap');if(vw)vw.style.display='none';const vv=document.getElementById('se-vigilante');if(vv)vv.value='';}
@@ -1479,7 +1487,7 @@ function saveRecord(type){
     }
   }
   else if(type==='terc'){if(!gi('e-cod')||!gi('e-emp')||!gi('e-per'))return alert('Preencha Código, Empresa e Período.');const qtd=gn('e-qtd'),unit=gn('e-unit');const sim=DB.terc.filter(r=>r.empresa===gi('e-emp')&&r.id!==_ed.terc);const avg=sim.length?sim.reduce((a,b)=>a+(b.unit||0),0)/sim.length:0;upsert('terc',{cod:gi('e-cod'),empresa:gi('e-emp'),qtd,unit,total:qtd*unit,period:gi('e-per'),warn:avg>0&&Math.abs(unit-avg)/avg>0.5});closeModal('terc');renderTerc();renderTercPivot();renderDash();}
-  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');const gratA=(gn('a-gratificadas')||0)>0?1:0;upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),aquisicao:gi('a-aquis'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:(gratA?0:vcliente),gratificadas:gratA});closeModal('armario');
+  else if(type==='armario'){if(!gi('a-cond'))return alert('Informe o condomínio.');const vcliente=gn('a-vcliente');const gratA=(gn('a-gratificadas')||0)>0?1:0;upsert('armario',{cond:gi('a-cond'),filial:gi('a-filial'),modelo:gi('a-modelo'),fornecedor:gi('a-forn'),contrato:gi('a-contrato'),status:gi('a-status'),portas:gn('a-portas'),pedido:gi('a-pedido'),nf:gi('a-nf'),inst:gi('a-inst'),saida:gi('a-saida'),aditivo:gn('a-aditivo'),carencia:gi('a-carencia'),vcliente,mens:gn('a-mens'),vforn:gn('a-vforn'),obs:gi('a-obs'),endereco:gi('a-endereco'),total:(gratA?0:vcliente),gratificadas:gratA});closeModal('armario');
     renderArmario();
     updateBadges();
     renderDash();
@@ -1817,7 +1825,7 @@ function verArmario(id){
     ${_verGrid('1fr 1fr 1fr 1fr',
       _verCard('Filial',`<span class="badge bg-blue">${_normFilial(r.filial)||'—'}</span>`)+
       _verCard('Fornecedor',`<span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span>`)+
-      _verCard('Aquisição',r.aquisicao||'—')+
+      _verCard('Contrato',r.contrato==='Sim'?'<span class="badge bg-green">Sim</span>':'<span class="badge bg-red">Não</span>')+
       _verCard('Modelo',r.modelo||'Padrão')
     )}
 
@@ -2402,6 +2410,20 @@ function _mesesDesde(dataStr){
   if(hoje.getDate()>=d.getDate()) m+=1; // conta o mês corrente se já passou o dia
   return Math.max(0,m);
 }
+function switchTorreSub(sub){
+  const reg=document.getElementById('torre-sub-reg');
+  const amort=document.getElementById('torre-sub-amort');
+  const bReg=document.getElementById('subtab-torre-reg');
+  const bAmort=document.getElementById('subtab-torre-amort');
+  const on=(b)=>{b.style.borderBottomColor='var(--accent)';b.style.color='var(--accent)';b.style.fontWeight='800';};
+  const off=(b)=>{b.style.borderBottomColor='transparent';b.style.color='var(--text3)';b.style.fontWeight='700';};
+  if(sub==='amort'){
+    reg.style.display='none';amort.style.display='';off(bReg);on(bAmort);
+    renderPaybackTorre();
+  }else{
+    reg.style.display='';amort.style.display='none';on(bReg);off(bAmort);
+  }
+}
 function renderPaybackTorre(){
   const el=document.getElementById('payback-torre');if(!el)return;
   const ativas=DB.torre.filter(r=>r.status==='ativo');
@@ -2536,7 +2558,7 @@ function renderTorre(){
   `;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
   renderGratLucro('torre');
-  renderPaybackTorre();
+  {const _am=document.getElementById('torre-sub-amort');if(_am&&_am.style.display!=='none')renderPaybackTorre();}
 }
 
 
@@ -2573,7 +2595,7 @@ function renderArmario(){
   const fq=gi('f-arm').toLowerCase(),ff=gi('f-arm-forn'),fst=gi('f-arm-st'),fcont=gi('f-arm-cont'),ffil=gi('f-arm-fil'),fgrat=gi('f-arm-grat');
   const rows=DB.armario.filter(r=>(!fq||(r.cond||'').toLowerCase().includes(fq)||(r.filial||'').toLowerCase().includes(fq))&&(!ff||r.fornecedor===ff)&&(!fst||r.status===fst)&&(!fcont||r.contrato===fcont)&&(!ffil||_normFilial(r.filial||'')=== ffil)&&(!fgrat||(fgrat==='sim'?(r.gratificadas>0):!(r.gratificadas>0))));document.getElementById('tb-armario').innerHTML=rows.length?rows.map(r=>`<tr class="${(r.status==='inativo'||r.status==='pendente')?'row-warn':''}">
       <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="armario" data-id="${r.id}" onchange="toggleSelect('armario','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
-      <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verArmario('${r.id}')" title="Ver detalhes">🔍 ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td style="color:var(--text3)">${r.aquisicao||'—'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · Cortesia (cliente não é cobrado)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--amber)">⭐</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
+      <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verArmario('${r.id}')" title="Ver detalhes">🔍 ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td>${r.contrato==='Sim'?'<span class="badge bg-green">Sim</span>':'<span class="badge bg-red">Não</span>'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · Cortesia (cliente não é cobrado)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--amber)">⭐</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verArmario('${r.id}')">👁</button>
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('armario','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('armario','${r.id}','${(r.cond||'').replace(/'/g,"\\'")}')">✕</button>
