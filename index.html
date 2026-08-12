@@ -2574,14 +2574,16 @@ function renderTorre(){
       </td>
     </tr>`).join(''):emptyR(13);
 
-  const at=DB.torre.filter(r=>r.status==='ativo');
-  const totalInst=at.reduce((s,r)=>s+(Number(r.qtd)||0),0);
+  const totalInstFiltro=rows.reduce((s,r)=>s+(Number(r.qtd)||0),0);
   const totalDisp=Object.values(EST.torre).reduce((s,f)=>s+(f.disponivel||0),0);
+  const _gratRowsT=rows.filter(r=>(Number(r.gratificadas)||0)>0).length;
   document.getElementById('tf-torre').innerHTML=`
-    <div class="tf-item"><span>Instaladas</span><strong style="color:var(--blue)">${totalInst}</strong></div>
+    <div class="tf-item"><span>Registros</span><strong style="color:var(--accent)">${rows.length}</strong></div>
+    <div class="tf-item"><span>Torres</span><strong style="color:var(--blue)">${totalInstFiltro}</strong></div>
+    <div class="tf-item"><span>⭐ Gratificadas</span><strong style="color:var(--amber)">${_gratRowsT}</strong></div>
     <div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div>
-    <div class="tf-item"><span>💰 Custo Empresa</span><strong style="color:var(--orange)" title="Todas as torres × custo unitário (incl. gratificadas)">${fmt(at.reduce((s,r)=>s+(Number(r.qtd)||0)*(Number(r.custo)||0),0))}</strong></div>
-    <div class="tf-item"><span>Val. Cobrado Clientes</span><strong style="color:var(--green)">${fmt(sum(at,'vcliente'))}</strong></div>
+    <div class="tf-item"><span>💰 Custo Empresa</span><strong style="color:var(--orange)" title="Torres filtradas × custo unitário (incl. gratificadas)">${fmt(rows.reduce((s,r)=>s+(Number(r.qtd)||0)*(Number(r.custo)||0),0))}</strong></div>
+    <div class="tf-item"><span>Val. Cobrado Clientes</span><strong style="color:var(--green)">${fmt(sum(rows,'vcliente'))}</strong></div>
   `;
   document.getElementById('alerts-torre').innerHTML=DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length?`<div class="al al-red">⚠ ${DB.torre.filter(r=>r.status==='inativo'&&(r.vcliente||0)>0).length} torre(s) inativa(s) com cobrança.</div>`:'';
   renderGratLucro('torre');
@@ -2626,7 +2628,7 @@ function renderArmario(){
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verArmario('${r.id}')">👁</button>
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('armario','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('armario','${r.id}','${(r.cond||'').replace(/'/g,"\\'")}')">✕</button>
-      </div></td></tr>`).join(''):emptyR(12);const at=DB.armario.filter(r=>r.status==='ativo');const totalDisp=Object.values(EST.armario).reduce((s,f)=>s+(f.disponivel||0),0);document.getElementById('tf-armario').innerHTML=`<div class="tf-item"><span>Val.Clientes</span><strong style="color:var(--blue)">${fmt(sum(at,'vcliente'))}</strong></div><div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div><div class="tf-item"><span>Val.Fornec.</span><strong style="color:var(--orange)">${fmt(sum(at,'vforn'))}</strong></div><div class="tf-item"><span>Total</span><strong>${fmt(sum(at,'vcliente'))}</strong></div>`;document.getElementById('alerts-armario').innerHTML=DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length?`<div class="al al-amber">⚠ ${DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length} armário(s) inativo(s) com cobrança.</div>`:'';renderGratLucro('armario');}
+      </div></td></tr>`).join(''):emptyR(12);const totalDisp=Object.values(EST.armario).reduce((s,f)=>s+(f.disponivel||0),0);const _gratRows=rows.filter(r=>(Number(r.gratificadas)||0)>0).length;document.getElementById('tf-armario').innerHTML=`<div class="tf-item"><span>Registros</span><strong style="color:var(--accent)">${rows.length}</strong></div><div class="tf-item"><span>⭐ Gratificados</span><strong style="color:var(--amber)">${_gratRows}</strong></div><div class="tf-item"><span>Val.Clientes</span><strong style="color:var(--blue)">${fmt(sum(rows,'vcliente'))}</strong></div><div class="tf-item"><span>Estoque</span><strong style="color:var(--green)">${totalDisp}</strong></div><div class="tf-item"><span>Val.Fornec.</span><strong style="color:var(--orange)">${fmt(sum(rows,'vforn'))}</strong></div><div class="tf-item"><span>Total</span><strong>${fmt(sum(rows,'vcliente'))}</strong></div>`;document.getElementById('alerts-armario').innerHTML=DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length?`<div class="al al-amber">⚠ ${DB.armario.filter(r=>r.status==='inativo'&&r.total>0).length} armário(s) inativo(s) com cobrança.</div>`:'';renderGratLucro('armario');}
 
 function renderSegware(){const fq=gi('f-seg').toLowerCase(),fper=gi('f-seg-per');const rows=DB.segware.filter(r=>(!fq||(r.produto||'').toLowerCase().includes(fq))&&(!fper||r.period===fper));document.getElementById('tb-segware').innerHTML=rows.length?rows.map(r=>`<tr><td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSegware('${r.id}')" title="Ver detalhes">🔍 ${r.produto}</td><td style="font-family:var(--mono)">${r.qtd}</td><td style="font-family:var(--mono)">${fmt(r.unit)}</td><td style="color:var(--accent);font-weight:800;font-family:var(--mono)">${fmt(r.total)}</td><td style="color:var(--text3);font-size:12px">${fmtPeriod(r.period)}</td><td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verSegware('${r.id}')">👁</button>
