@@ -2384,7 +2384,7 @@ function selAllTab(tab,cb){document.querySelectorAll('.row-check[data-tab="'+tab
 
 function renderGratLucro(tipo){
   const el=document.getElementById('grat-lucro-'+tipo);if(!el)return;
-  let custoGrat=0, receita=0, qtdGrat=0;
+  let custoGrat=0, receita=0, qtdGrat=0, custoNaoGrat=0, qtdNaoGrat=0;
   if(tipo==='torre'){
     // Custo das gratificadas: gratificadas × custo (ativas + pendentes)
     DB.torre.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
@@ -2397,6 +2397,7 @@ function renderGratLucro(tipo){
     // Armário: custo das gratificadas = valor fornecedor das unidades gratificadas (ativas)
     DB.armario.filter(r=>r.status==='ativo').forEach(r=>{
       if((Number(r.gratificadas)||0)>0){custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
+      else{custoNaoGrat+=(Number(r.vforn)||0);qtdNaoGrat++;}
     });
     receita=DB.armario.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
   }
@@ -2407,9 +2408,10 @@ function renderGratLucro(tipo){
   const stat=(num,txt,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:20px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${txt}</div></div>`;
   el.innerHTML=`
     <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px">
-      <div style="font-size:13px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">${pos?'📈':'📉'} Gratificações × Receita <span style="font-weight:600;color:var(--text3);text-transform:none">— ${qtdGrat} ${lbl} gratificad${tipo==='torre'?'as':'os'}</span></div>
+      <div style="font-size:13px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">${pos?'📈':'📉'} Gratificações × Receita <span style="font-weight:600;color:var(--text3);text-transform:none">— ${qtdGrat} ${lbl} gratificad${tipo==='torre'?'as':'os'}${tipo==='armario'?' · '+qtdNaoGrat+' não gratificados':''}</span></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         ${stat(fmt(custoGrat),'Custo das Gratificadas','var(--amber)')}
+        ${tipo==='armario'?stat(fmt(custoNaoGrat),'Custo dos Ativos (não gratif.)','var(--orange)'):''}
         ${stat(fmt(receita),'Receita dos Clientes','var(--blue)')}
         ${stat((pos?'':'−')+fmt(Math.abs(saldo)),pos?'Saldo (Lucro)':'Saldo (Prejuízo)',cRes)}
       </div>
