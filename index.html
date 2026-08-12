@@ -2401,7 +2401,8 @@ function renderGratLucro(tipo){
     });
     receita=DB.armario.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
   }
-  const saldo=receita-custoGrat;
+  const custoTotal=tipo==='armario'?(custoGrat+custoNaoGrat):custoGrat;
+  const saldo=receita-custoTotal;
   const pos=saldo>=0;
   const cRes=pos?'var(--green)':'var(--red)';
   const lbl=tipo==='torre'?'torres':'armários';
@@ -2416,9 +2417,13 @@ function renderGratLucro(tipo){
         ${stat((pos?'':'−')+fmt(Math.abs(saldo)),pos?'Saldo (Lucro)':'Saldo (Prejuízo)',cRes)}
       </div>
       <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5">
-        ${pos
-          ? '✓ A receita dos clientes cobre o custo das cortesias com folga de '+fmt(saldo)+'.'
-          : '⚠ O custo das cortesias supera a receita em '+fmt(Math.abs(saldo))+'.'}
+        ${tipo==='armario'
+          ? (pos
+            ? '✓ A receita dos clientes cobre todos os custos (gratificadas + ativos) com folga de '+fmt(saldo)+'.'
+            : '⚠ Os custos totais (gratificadas + ativos) superam a receita em '+fmt(Math.abs(saldo))+'.')
+          : (pos
+            ? '✓ A receita dos clientes cobre o custo das cortesias com folga de '+fmt(saldo)+'.'
+            : '⚠ O custo das cortesias supera a receita em '+fmt(Math.abs(saldo))+'.')}
       </div>
     </div>`;
 }
