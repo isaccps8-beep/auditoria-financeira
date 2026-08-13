@@ -2402,8 +2402,8 @@ function renderGratLucro(tipo){
       if(tipo==='torre'){custoGrat+=(Number(r.gratificadas)||0)*(Number(r.custo)||0);qtdGrat+=(Number(r.gratificadas)||0);}
       else{custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
     }
-    // Custo dos Ativos (só ativos)
-    if(st==='ativo'){
+    // Custo dos Ativos: apenas NÃO gratificados (ativos + pendentes + inativos)
+    if((st==='ativo'||st==='pendente'||st==='inativo') && !(Number(r.gratificadas)>0)){
       custoAtivos+=custoDe(r); qtdAtivos+=qtdDe(r);
     }
   });
@@ -2449,7 +2449,7 @@ function renderGratLucro(tipo){
       <div style="display:flex;gap:12px;flex-wrap:wrap">
         ${card('Custo Total (todos)',qtdTotalAdq,fmt(custoTotalAdq),'var(--purple-t)','🏗️')}
         ${card('Custo das Gratificadas',qtdGrat,fmt(custoGrat),'var(--amber)','⭐')}
-        ${card('Custo dos Ativos',qtdAtivos,fmt(custoAtivos),'var(--orange)','📦')}
+        ${card('Custo Não Gratificados',qtdAtivos,fmt(custoAtivos),'var(--orange)','📦')}
         ${card('Receita dos Clientes',qtdRecCli,fmt(receita),'var(--blue)','💵')}
         ${cardResultado}
       </div>
