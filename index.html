@@ -48,8 +48,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14
 .kpi-row{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:20px}
 @media(max-width:1400px){.kpi-row{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:800px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
-.kpi{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 15px;position:relative;overflow:hidden;transition:.2s;cursor:pointer;box-shadow:var(--shadow-xs)}
-.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.kpi{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;padding:16px 15px;position:relative;overflow:hidden;transition:transform .2s cubic-bezier(.4,0,.2,1),box-shadow .2s,border-color .2s;cursor:pointer;box-shadow:var(--shadow-xs)}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--border2)}
+
 .kpi.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent),var(--shadow);transform:translateY(-2px)}
 .kpi.active .kpi-lbl{color:var(--accent)}
 .kpi.c1.active{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 20%,transparent),var(--shadow)}
@@ -80,7 +81,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14
 .charts-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px}
 @media(max-width:1100px){.charts-2,.charts-3{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.charts-2,.charts-3{grid-template-columns:1fr}}
-.card{background:var(--surface);border:2px solid var(--border);border-radius:14px;box-shadow:var(--shadow-xs)}
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:18px;box-shadow:var(--shadow-xs)}
 [data-theme=dark] .card{background:var(--surface2);border-color:var(--border2)}
 .card-hdr{padding:16px 18px 0}.card-title{font-size:13px;font-weight:800;color:var(--text)}.card-sub{font-size:11px;color:var(--text3);margin-top:2px;font-weight:500}.chart-body{padding:14px 18px 18px}
 .comp-wrap{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-bottom:20px}
@@ -112,14 +113,14 @@ option{background:var(--surface)}
 .btn-ghost{background:transparent;color:var(--text2);border:2px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
 .btn-danger{background:var(--red-l);color:var(--red-t);border:2px solid color-mix(in srgb,var(--red) 25%,transparent)}
 .btn-estoque{background:var(--blue-l);color:var(--blue-t);border:2px solid color-mix(in srgb,var(--blue) 30%,transparent)}.btn-estoque:hover{background:var(--blue);color:#fff}
-.tbl-wrap{overflow-x:auto;border-radius:12px;border:2px solid var(--border);box-shadow:var(--shadow-xs)}
+.tbl-wrap{overflow-x:auto;border-radius:16px;border:1.5px solid var(--border);box-shadow:var(--shadow-xs)}
 table{width:100%;border-collapse:collapse;background:var(--surface);font-size:13px}
 [data-theme=dark] table{background:var(--surface2)}
 thead tr{background:linear-gradient(135deg,var(--surface2),var(--surface3))}
 [data-theme=dark] thead tr{background:var(--surface3)}
 th{padding:10px 13px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);border-bottom:2px solid var(--border);white-space:nowrap;text-align:left;font-family:var(--sans)}
 td{padding:10px 13px;color:var(--text2);border-bottom:1px solid var(--border);vertical-align:middle;font-weight:600;font-size:13px}
-tr:last-child td{border-bottom:none}tbody tr{transition:.1s}tbody tr:hover{background:var(--surface2)}
+tr:last-child td{border-bottom:none}tbody tr{transition:.1s}tbody tr:hover{background:var(--surface2);box-shadow:inset 3px 0 0 var(--accent)}
 [data-theme=dark] tbody tr:hover{background:var(--surface3)}
 tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!important}
 .tbl-foot{display:flex;align-items:center;justify-content:flex-end;gap:16px;padding:10px 14px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border-top:2px solid var(--border);border-radius:0 0 10px 10px;flex-wrap:wrap}
@@ -131,7 +132,7 @@ tr.row-warn td{background:color-mix(in srgb,var(--amber-l) 60%,transparent)!impo
 .bg-green{background:var(--green-l);color:var(--green-t)}.bg-red{background:var(--red-l);color:var(--red-t)}.bg-amber{background:var(--amber-l);color:var(--amber-t)}.bg-blue{background:var(--blue-l);color:var(--blue-t)}.bg-purple{background:var(--purple-l);color:var(--purple-t)}.bg-cyan{background:var(--cyan-l);color:var(--cyan-t)}
 .overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:2px solid var(--border);border-radius:16px;width:min(820px,100%);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
+.modal{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;width:min(820px,100%);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
 .modal-sm{width:min(560px,100%)}
 .modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:2px solid var(--border);position:sticky;top:0;background:linear-gradient(135deg,var(--surface),var(--surface2));z-index:1;border-radius:14px 14px 0 0}
 .modal-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px}.modal-sub{font-size:11px;color:var(--text3);margin-top:2px;font-weight:600}
@@ -287,7 +288,7 @@ textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);b
 <div class="app">
 
 <header class="header">
-  <div class="brand"><div class="brand-mark">AF</div><span class="brand-name">Audit<em>oria</em></span><span style="margin-left:8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.65);background:rgba(255,255,255,.12);padding:2px 8px;border-radius:20px;letter-spacing:.5px">v2 · UI</span></div>
+  <div class="brand"><div class="brand-mark">AF</div><span class="brand-name">Audit<em>oria</em></span><span style="margin-left:8px;font-size:10px;font-weight:700;color:rgba(255,255,255,.65);background:rgba(255,255,255,.12);padding:2px 8px;border-radius:20px;letter-spacing:.5px">v3 · UI</span></div>
   <div class="header-divider"></div>
   <div class="period-tag"><div class="live"></div><span id="periodLabel">— / ——</span></div>
   <div class="spacer"></div>
@@ -2387,46 +2388,59 @@ function selAllTab(tab,cb){document.querySelectorAll('.row-check[data-tab="'+tab
 
 function renderGratLucro(tipo){
   const el=document.getElementById('grat-lucro-'+tipo);if(!el)return;
-  let custoGrat=0, receita=0, qtdGrat=0, custoNaoGrat=0, qtdNaoGrat=0;
+  let custoGrat=0, receita=0, qtdGrat=0, custoNaoGrat=0, qtdNaoGrat=0, qtdRecCli=0;
   if(tipo==='torre'){
-    // Custo das gratificadas: gratificadas × custo (ativas + pendentes)
     DB.torre.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
       const g=Number(r.gratificadas)||0;
       if(g>0){custoGrat+=g*(Number(r.custo)||0);qtdGrat+=g;}
     });
-    // Receita: valor pago pelos clientes (ativas)
-    receita=DB.torre.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+    const ativasCli=DB.torre.filter(r=>r.status==='ativo');
+    receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+    qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
+    qtdNaoGrat=DB.torre.filter(r=>r.status==='ativo'&&!(Number(r.gratificadas)>0)).length;
   }else{
-    // Armário: custo das gratificadas = valor fornecedor das unidades gratificadas (ativas)
     DB.armario.filter(r=>r.status==='ativo').forEach(r=>{
       if((Number(r.gratificadas)||0)>0){custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
       else{custoNaoGrat+=(Number(r.vforn)||0);qtdNaoGrat++;}
     });
-    receita=DB.armario.filter(r=>r.status==='ativo').reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+    const ativasCli=DB.armario.filter(r=>r.status==='ativo');
+    receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+    qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
   }
   const custoTotal=tipo==='armario'?(custoGrat+custoNaoGrat):custoGrat;
   const saldo=receita-custoTotal;
   const pos=saldo>=0;
   const cRes=pos?'var(--green)':'var(--red)';
   const lbl=tipo==='torre'?'torres':'armários';
-  const stat=(num,txt,col)=>`<div style="flex:1;min-width:150px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow-xs)"><div style="font-size:20px;font-weight:800;color:${col};font-family:var(--mono)">${num}</div><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">${txt}</div></div>`;
-  el.innerHTML=`
-    <div style="background:var(--surface2);border:2px solid var(--border);border-radius:14px;padding:14px">
-      <div style="font-size:13px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px">${pos?'📈':'📉'} Gratificações × Receita <span style="font-weight:600;color:var(--text3);text-transform:none">— ${qtdGrat} ${lbl} gratificad${tipo==='torre'?'as':'os'}${tipo==='armario'?' · '+qtdNaoGrat+' não gratificados':''}</span></div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${stat(fmt(custoGrat),'Custo das Gratificadas','var(--amber)')}
-        ${tipo==='armario'?stat(fmt(custoNaoGrat),'Custo dos Ativos (não gratif.)','var(--orange)'):''}
-        ${stat(fmt(receita),'Receita dos Clientes','var(--blue)')}
-        ${stat((pos?'':'−')+fmt(Math.abs(saldo)),pos?'Saldo (Lucro)':'Saldo (Prejuízo)',cRes)}
+  // Card no modelo: título · Quantidade: N · Valor: X
+  const card=(titulo,qtd,valor,cor,icone)=>`
+    <div style="flex:1;min-width:210px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-xs);position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:${cor}"></div>
+      <div style="font-size:12px;font-weight:800;color:${cor};text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;display:flex;align-items:center;gap:6px">${icone||''} ${titulo}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Quantidade</span>
+        <span style="font-size:15px;font-weight:800;color:var(--text);font-family:var(--mono)">${qtd}</span>
       </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5">
-        ${tipo==='armario'
-          ? (pos
-            ? '✓ A receita dos clientes cobre todos os custos (gratificadas + ativos) com folga de '+fmt(saldo)+'.'
-            : '⚠ Os custos totais (gratificadas + ativos) superam a receita em '+fmt(Math.abs(saldo))+'.')
-          : (pos
-            ? '✓ A receita dos clientes cobre o custo das cortesias com folga de '+fmt(saldo)+'.'
-            : '⚠ O custo das cortesias supera a receita em '+fmt(Math.abs(saldo))+'.')}
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Valor</span>
+        <span style="font-size:18px;font-weight:800;color:${cor};font-family:var(--mono)">${valor}</span>
+      </div>
+    </div>`;
+  // Card de resultado (saldo) — sem quantidade
+  const cardResultado=`
+    <div style="flex:1;min-width:210px;background:${pos?'var(--green-l)':'var(--red-l)'};border:2px solid ${cRes};border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-xs)">
+      <div style="font-size:12px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">${pos?'📈 Saldo (Lucro)':'📉 Saldo (Prejuízo)'}</div>
+      <div style="font-size:26px;font-weight:800;color:${cRes};font-family:var(--mono)">${(pos?'':'−')+fmt(Math.abs(saldo))}</div>
+      <div style="font-size:11px;font-weight:600;color:var(--text3);margin-top:4px">Receita − Custos</div>
+    </div>`;
+  el.innerHTML=`
+    <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:18px">
+      <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px;margin-bottom:16px;display:flex;align-items:center;gap:8px">💰 Análise de Custos × Receita</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${card('Custo das Gratificadas',qtdGrat,fmt(custoGrat),'var(--amber)','⭐')}
+        ${tipo==='armario'?card('Custo dos Ativos',qtdNaoGrat,fmt(custoNaoGrat),'var(--orange)','📦'):''}
+        ${card('Receita dos Clientes',qtdRecCli,fmt(receita),'var(--blue)','💵')}
+        ${cardResultado}
       </div>
     </div>`;
 }
