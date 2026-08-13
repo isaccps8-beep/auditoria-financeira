@@ -2433,10 +2433,17 @@ function renderGratLucro(tipo){
     </div>`;
   // Card de resultado (saldo) — sem quantidade
   const cardResultado=`
-    <div style="flex:1;min-width:210px;background:${pos?'var(--green-l)':'var(--red-l)'};border:2px solid ${cRes};border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-xs)">
-      <div style="font-size:12px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">${pos?'📈 Saldo (Lucro)':'📉 Saldo (Prejuízo)'}</div>
-      <div style="font-size:26px;font-weight:800;color:${cRes};font-family:var(--mono)">${(pos?'':'−')+fmt(Math.abs(saldo))}</div>
-      <div style="font-size:11px;font-weight:600;color:var(--text3);margin-top:4px">Receita − Custos</div>
+    <div style="flex:1;min-width:210px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-xs);position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:${cRes}"></div>
+      <div style="font-size:12px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;display:flex;align-items:center;gap:6px">${pos?'📈 Saldo (Lucro)':'📉 Saldo (Prejuízo)'}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Cálculo</span>
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Receita − Custos</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Resultado</span>
+        <span style="font-size:18px;font-weight:800;color:${cRes};font-family:var(--mono)">${(pos?'':'−')+fmt(Math.abs(saldo))}</span>
+      </div>
     </div>`;
   el.innerHTML=`
     <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:18px">
