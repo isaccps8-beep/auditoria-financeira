@@ -2395,10 +2395,8 @@ function renderGratLucro(tipo){
   const base=tipo==='torre'?DB.torre:DB.armario;
   base.forEach(r=>{
     const st=r.status;
-    // Custo Total: TODOS os adquiridos (ativos + inativos + pendentes), incluindo gratificados
-    if(st==='ativo'||st==='inativo'||st==='pendente'){
-      custoTotalAdq+=custoDe(r); qtdTotalAdq+=qtdDe(r);
-    }
+    // Custo Total: TODOS os adquiridos, independente do status
+    custoTotalAdq+=custoDe(r); qtdTotalAdq+=qtdDe(r);
     // Custo das Gratificadas
     if((Number(r.gratificadas)||0)>0 && (st==='ativo'||st==='pendente'||st==='inativo')){
       if(tipo==='torre'){custoGrat+=(Number(r.gratificadas)||0)*(Number(r.custo)||0);qtdGrat+=(Number(r.gratificadas)||0);}
@@ -2449,7 +2447,7 @@ function renderGratLucro(tipo){
     <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:18px">
       <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px;margin-bottom:16px;display:flex;align-items:center;gap:8px">💰 Análise de Custos × Receita</div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        ${card('Custo Total (adquiridos)',qtdTotalAdq,fmt(custoTotalAdq),'var(--purple-t)','🏗️')}
+        ${card('Custo Total (todos)',qtdTotalAdq,fmt(custoTotalAdq),'var(--purple-t)','🏗️')}
         ${card('Custo das Gratificadas',qtdGrat,fmt(custoGrat),'var(--amber)','⭐')}
         ${card('Custo dos Ativos',qtdAtivos,fmt(custoAtivos),'var(--orange)','📦')}
         ${card('Receita dos Clientes',qtdRecCli,fmt(receita),'var(--blue)','💵')}
