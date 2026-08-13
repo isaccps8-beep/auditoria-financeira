@@ -2389,30 +2389,30 @@ function selAllTab(tab,cb){document.querySelectorAll('.row-check[data-tab="'+tab
 
 function renderGratLucro(tipo){
   const el=document.getElementById('grat-lucro-'+tipo);if(!el)return;
-  let custoGrat=0, receita=0, qtdGrat=0, custoNaoGrat=0, qtdNaoGrat=0, qtdRecCli=0;
-  if(tipo==='torre'){
-    DB.torre.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
-      const g=Number(r.gratificadas)||0;
-      if(g>0){custoGrat+=g*(Number(r.custo)||0);qtdGrat+=g;}
-    });
-    const ativasCli=DB.torre.filter(r=>r.status==='ativo');
-    receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
-    qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
-    qtdNaoGrat=DB.torre.filter(r=>r.status==='ativo'&&!(Number(r.gratificadas)>0)).length;
-  }else{
-    // Gratificadas: ativas E pendentes (empresa já tem o custo mesmo pendente)
-    DB.armario.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
-      if((Number(r.gratificadas)||0)>0){custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
-    });
-    // Custo dos ativos não gratificados: só ativos
-    DB.armario.filter(r=>r.status==='ativo'&&!(Number(r.gratificadas)>0)).forEach(r=>{
-      custoNaoGrat+=(Number(r.vforn)||0);qtdNaoGrat++;
-    });
-    const ativasCli=DB.armario.filter(r=>r.status==='ativo');
-    receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
-    qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
-  }
-  const custoTotal=tipo==='armario'?(custoGrat+custoNaoGrat):custoGrat;
+  let custoTotalAdq=0, qtdTotalAdq=0, custoGrat=0, qtdGrat=0, custoAtivos=0, qtdAtivos=0, receita=0, qtdRecCli=0;
+  const custoDe=r=>tipo==='torre'?((Number(r.qtd)||0)*(Number(r.custo)||0)):(Number(r.vforn)||0);
+  const qtdDe=r=>tipo==='torre'?(Number(r.qtd)||0):1;
+  const base=tipo==='torre'?DB.torre:DB.armario;
+  base.forEach(r=>{
+    const st=r.status;
+    // Custo Total: TODOS os adquiridos (ativos + inativos + pendentes), incluindo gratificados
+    if(st==='ativo'||st==='inativo'||st==='pendente'){
+      custoTotalAdq+=custoDe(r); qtdTotalAdq+=qtdDe(r);
+    }
+    // Custo das Gratificadas
+    if((Number(r.gratificadas)||0)>0 && (st==='ativo'||st==='pendente'||st==='inativo')){
+      if(tipo==='torre'){custoGrat+=(Number(r.gratificadas)||0)*(Number(r.custo)||0);qtdGrat+=(Number(r.gratificadas)||0);}
+      else{custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
+    }
+    // Custo dos Ativos (só ativos)
+    if(st==='ativo'){
+      custoAtivos+=custoDe(r); qtdAtivos+=qtdDe(r);
+    }
+  });
+  const ativasCli=base.filter(r=>r.status==='ativo');
+  receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
+  qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
+  const custoTotal=custoTotalAdq;
   const saldo=receita-custoTotal;
   const pos=saldo>=0;
   const cRes=pos?'var(--green)':'var(--red)';
@@ -2438,7 +2438,7 @@ function renderGratLucro(tipo){
       <div style="font-size:12px;font-weight:800;color:${cRes};text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;display:flex;align-items:center;gap:6px">${pos?'📈 Saldo (Lucro)':'📉 Saldo (Prejuízo)'}</div>
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
         <span style="font-size:11px;font-weight:600;color:var(--text3)">Cálculo</span>
-        <span style="font-size:11px;font-weight:600;color:var(--text3)">Receita − Custos</span>
+        <span style="font-size:11px;font-weight:600;color:var(--text3)">Receita − Custo Total</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:baseline">
         <span style="font-size:11px;font-weight:600;color:var(--text3)">Resultado</span>
@@ -2449,8 +2449,9 @@ function renderGratLucro(tipo){
     <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:18px">
       <div style="font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px;margin-bottom:16px;display:flex;align-items:center;gap:8px">💰 Análise de Custos × Receita</div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${card('Custo Total (adquiridos)',qtdTotalAdq,fmt(custoTotalAdq),'var(--purple-t)','🏗️')}
         ${card('Custo das Gratificadas',qtdGrat,fmt(custoGrat),'var(--amber)','⭐')}
-        ${tipo==='armario'?card('Custo dos Ativos',qtdNaoGrat,fmt(custoNaoGrat),'var(--orange)','📦'):''}
+        ${card('Custo dos Ativos',qtdAtivos,fmt(custoAtivos),'var(--orange)','📦')}
         ${card('Receita dos Clientes',qtdRecCli,fmt(receita),'var(--blue)','💵')}
         ${cardResultado}
       </div>
