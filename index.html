@@ -2104,6 +2104,7 @@ function renderEstoqueFiliais(tipo){
       const f=_normFilial((r.filial||'').trim());
       if(!f) return;
       pendPF[f]=(pendPF[f]||0)+1;
+      if((Number(r.gratificadas)||0)>0) gratPF[f]=(gratPF[f]||0)+1;
     });
     DB.armario.filter(r=>r.status==='inativo').forEach(r=>{
       const f=_normFilial((r.filial||'').trim());
@@ -2399,9 +2400,13 @@ function renderGratLucro(tipo){
     qtdRecCli=ativasCli.filter(r=>(Number(r.vcliente)||0)>0).length;
     qtdNaoGrat=DB.torre.filter(r=>r.status==='ativo'&&!(Number(r.gratificadas)>0)).length;
   }else{
-    DB.armario.filter(r=>r.status==='ativo').forEach(r=>{
+    // Gratificadas: ativas E pendentes (empresa já tem o custo mesmo pendente)
+    DB.armario.filter(r=>r.status==='ativo'||r.status==='pendente').forEach(r=>{
       if((Number(r.gratificadas)||0)>0){custoGrat+=(Number(r.vforn)||0);qtdGrat++;}
-      else{custoNaoGrat+=(Number(r.vforn)||0);qtdNaoGrat++;}
+    });
+    // Custo dos ativos não gratificados: só ativos
+    DB.armario.filter(r=>r.status==='ativo'&&!(Number(r.gratificadas)>0)).forEach(r=>{
+      custoNaoGrat+=(Number(r.vforn)||0);qtdNaoGrat++;
     });
     const ativasCli=DB.armario.filter(r=>r.status==='ativo');
     receita=ativasCli.reduce((s,r)=>s+(Number(r.vcliente)||0),0);
@@ -2556,7 +2561,7 @@ function renderTorre(){
         <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="verTorre('${r.id}')">
           <div style="width:32px;height:32px;border-radius:8px;background:var(--blue-l);border:1.5px solid color-mix(in srgb,var(--blue) 25%,transparent);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${r.tipo==='Alarme'?'🚨':'📡'}</div>
           <div>
-            <div style="font-weight:800;font-size:13px;color:${r.status==='inativo'?'var(--amber)':'var(--accent)'}">${r.cliente||'—'}</div>
+            <div style="font-weight:800;font-size:13px;color:${r.status==='inativo'?'var(--amber)':'var(--text)'}">${r.cliente||'—'}</div>
             ${r.endereco?`<div style="font-size:10px;color:var(--text3);font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.endereco}</div>`:''}
           </div>
         </div>
@@ -2641,7 +2646,7 @@ function renderArmario(){
   const fq=gi('f-arm').toLowerCase(),ff=gi('f-arm-forn'),fst=gi('f-arm-st'),fcont=gi('f-arm-cont'),ffil=gi('f-arm-fil'),fgrat=gi('f-arm-grat');
   const rows=DB.armario.filter(r=>(!fq||(r.cond||'').toLowerCase().includes(fq)||(r.filial||'').toLowerCase().includes(fq))&&(!ff||r.fornecedor===ff)&&(!fst||r.status===fst)&&(!fcont||r.contrato===fcont)&&(!ffil||_normFilial(r.filial||'')=== ffil)&&(!fgrat||(fgrat==='sim'?(r.gratificadas>0):!(r.gratificadas>0))));document.getElementById('tb-armario').innerHTML=rows.length?rows.map(r=>`<tr class="${(r.status==='inativo'||r.status==='pendente')?'row-warn':''}">
       <td style="width:28px;padding:6px 8px;text-align:center"><input type="checkbox" class="row-check" data-tab="armario" data-id="${r.id}" onchange="toggleSelect('armario','${r.id}',this)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--accent)"></td>
-      <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verArmario('${r.id}')" title="Ver detalhes">🔍 ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td>${r.contrato==='Sim'?'<span class="badge bg-green">Sim</span>':'<span class="badge bg-red">Não</span>'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · Cortesia (cliente não é cobrado)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--amber)">⭐</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
+      <td style="font-weight:800;cursor:pointer;color:var(--text)" onclick="verArmario('${r.id}')" title="Ver detalhes"><span style="color:var(--accent)">🔍</span> ${r.cond||'—'}</td><td><span class="badge bg-blue">${r.filial||'—'}</span></td><td><span class="badge ${r.fornecedor==='Bicateca'?'bg-cyan':'bg-purple'}">${r.fornecedor||'—'}</span></td><td>${r.contrato==='Sim'?'<span class="badge bg-green">Sim</span>':'<span class="badge bg-red">Não</span>'}</td><td style="text-align:center;white-space:nowrap">${(r.gratificadas>0)?`<span title="${r.portas||0} portas · Cortesia (cliente não é cobrado)" style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,var(--purple-l),var(--amber-l));border:1.5px solid var(--amber);border-radius:8px;padding:2px 8px;font-family:var(--mono);font-weight:800;font-size:12px;cursor:help"><span style="color:var(--purple)">${r.portas||0}</span><span style="color:var(--amber)">⭐</span></span>`:`<span style="font-family:var(--mono)">${r.portas||'—'}</span>`}</td><td style="color:var(--text3);font-size:12px">${fmtDate(r.inst)}</td><td style="color:var(--blue);font-family:var(--mono)">${fmt(r.vcliente||0)}</td><td style="font-family:var(--mono)">${fmt(r.mens||0)}</td><td style="color:var(--orange);font-family:var(--mono)">${fmt(r.vforn||0)}</td><td><span class="badge ${statusBadge(r.status)}">${r.status}</span></td><td><div style="display:flex;gap:4px">
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="verArmario('${r.id}')">👁</button>
         <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px;height:28px" onclick="openModal('armario','${r.id}')">✏️</button>
         <button class="btn btn-danger" style="padding:3px 8px;font-size:12px;height:28px" onclick="askDelete('armario','${r.id}','${(r.cond||'').replace(/'/g,"\\'")}')">✕</button>
@@ -2705,7 +2710,7 @@ function renderSeguros(){
   document.getElementById('tb-seguros').innerHTML=rows.length?rows.map((r,i)=>`<tr>
     <td style="font-family:var(--mono);color:var(--text3);font-size:12px">${i+1}</td>
     <td style="font-family:var(--mono);font-size:12px">${_fmtD(r.data)}</td>
-    <td style="font-weight:800;cursor:pointer;color:var(--accent)" onclick="verSeguros('${r.id}')" title="Ver detalhes">🔍 ${r.cliente||'—'}</td>
+    <td style="font-weight:800;cursor:pointer;color:var(--text)" onclick="verSeguros('${r.id}')" title="Ver detalhes"><span style="color:var(--accent)">🔍</span> ${r.cliente||'—'}</td>
     <td style="font-family:var(--mono);font-size:12px;color:var(--text3)">${r.conta||'—'}</td>
     <td><span class="badge bg-blue">${r.filial||'—'}</span></td>
     <td style="font-size:12px">${r.servico||'—'}${r.vigilante==='Sim'?' <span title="Vigilante da seguradora solicitado" style="color:var(--green);font-weight:800">🛡️</span>':''}</td>
